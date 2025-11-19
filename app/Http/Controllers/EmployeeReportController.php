@@ -26,18 +26,90 @@ class EmployeeReportController extends Controller
      */
     public function getEmployeeReport(Request $request)
     {
+        $employees = Employee::where('is_deleted', false)->where('status', 1)->orderBy('name')->get();
+
         $validator = Validator::make($request->all(), [
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
+            // Return JSON for API requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            // Return view with errors for web requests
+            return view('pages.employees.reports.employee', compact('employees'))
+                ->withErrors($validator);
+        }
+
+        // If no employee_id provided, show all employees' reports
+        if (!$request->has('employee_id') || !$request->employee_id) {
+            // Auto-display all employees' reports
+            $allReports = [];
+            foreach ($employees as $emp) {
+                $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+                $endDate = $request->end_date ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
+
+                // Get attendance summary
+                $attendances = EmployeeAttendance::where('employee_id', $emp->id)
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->get();
+
+                $attendanceSummary = [
+                    'total_days' => $attendances->count(),
+                    'present_days' => $attendances->where('status', 'present')->count(),
+                    'absent_days' => $attendances->where('status', 'absent')->count(),
+                    'half_days' => $attendances->where('status', 'half_day')->count(),
+                    'total_working_days' => $attendances->where('status', 'present')->count() + ($attendances->where('status', 'half_day')->count() * 0.5),
+                ];
+
+                // Get salary records
+                $salaries = EmployeeSalary::where('employee_id', $emp->id)
+                    ->whereBetween('month', [
+                        $startDate->format('Y-m'),
+                        $endDate->format('Y-m')
+                    ])
+                    ->orderBy('month', 'desc')
+                    ->get();
+
+                $allReports[] = [
+                    'employee' => [
+                        'id' => $emp->id,
+                        'name' => $emp->name,
+                        'contact' => $emp->contact,
+                        'designation' => $emp->designation,
+                        'monthly_salary' => $emp->monthly_salary,
+                        'ot_rate_per_hour' => $emp->ot_rate_per_hour,
+                    ],
+                    'attendance_summary' => $attendanceSummary,
+                    'salary_calculations' => $salaries->map(function($salary) {
+                        return [
+                            'month' => $salary->month,
+                            'present_days' => $salary->present_days,
+                            'absent_days' => $salary->absent_days,
+                            'half_days' => $salary->half_days,
+                            'total_ot_hours' => $salary->total_ot_hours,
+                            'total_advance_amount' => $salary->total_advance_amount,
+                            'base_salary' => $salary->base_salary,
+                            'ot_amount' => $salary->ot_amount,
+                            'final_salary' => $salary->final_salary,
+                        ];
+                    }),
+                ];
+            }
+
+            return view('pages.employees.reports.employee', compact('employees', 'allReports'))
+                ->with('period', [
+                    'start_date' => ($request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth())->format('Y-m-d'),
+                    'end_date' => ($request->end_date ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth())->format('Y-m-d'),
+                ]);
         }
 
         $employee = Employee::findOrFail($request->employee_id);
@@ -115,27 +187,35 @@ class EmployeeReportController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'employee' => [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'contact' => $employee->contact,
-                    'designation' => $employee->designation,
-                    'monthly_salary' => $employee->monthly_salary,
-                    'ot_rate_per_hour' => $employee->ot_rate_per_hour,
-                ],
-                'period' => [
-                    'start_date' => $startDate->format('Y-m-d'),
-                    'end_date' => $endDate->format('Y-m-d'),
-                ],
-                'attendance_summary' => $attendanceSummary,
-                'monthly_ot' => $monthlyOT,
-                'advance_salary_deductions' => $advanceSummary,
-                'salary_calculations' => $salarySummary,
-            ]
-        ]);
+        $reportData = [
+            'employee' => [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'contact' => $employee->contact,
+                'designation' => $employee->designation,
+                'monthly_salary' => $employee->monthly_salary,
+                'ot_rate_per_hour' => $employee->ot_rate_per_hour,
+            ],
+            'period' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+            'attendance_summary' => $attendanceSummary,
+            'monthly_ot' => $monthlyOT,
+            'advance_salary_deductions' => $advanceSummary,
+            'salary_calculations' => $salarySummary,
+        ];
+
+        // Return JSON for API requests
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => $reportData
+            ]);
+        }
+
+        // Return view for web requests
+        return view('pages.employees.reports.employee', compact('employees', 'reportData'));
     }
 
     /**
@@ -143,17 +223,31 @@ class EmployeeReportController extends Controller
      */
     public function getMonthlyReport(Request $request)
     {
+        $employees = Employee::where('is_deleted', false)->where('status', 1)->orderBy('name')->get();
+
+        // If no parameters provided and it's a web request, show the form
+        if ((!$request->has('employee_id') || !$request->has('month')) && !$request->wantsJson() && !$request->ajax()) {
+            return view('pages.employees.reports.monthly', compact('employees'));
+        }
+
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
             'month' => 'required|date_format:Y-m',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
+            // Return JSON for API requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            // Return view with errors for web requests
+            return view('pages.employees.reports.monthly', compact('employees'))
+                ->withErrors($validator);
         }
 
         try {
@@ -162,15 +256,28 @@ class EmployeeReportController extends Controller
                 $request->month
             );
 
-            return response()->json([
-                'success' => true,
-                'data' => $breakdown
-            ]);
+            // Return JSON for API requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $breakdown
+                ]);
+            }
+
+            // Return view for web requests
+            return view('pages.employees.reports.monthly', compact('employees', 'breakdown'));
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            // Return JSON for API requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+
+            // Return view with error for web requests
+            return view('pages.employees.reports.monthly', compact('employees'))
+                ->with('error', $e->getMessage());
         }
     }
 }

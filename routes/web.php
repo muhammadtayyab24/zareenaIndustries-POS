@@ -39,27 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::post('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
     
-    // Employee Management Routes
-    Route::resource('employees', EmployeeController::class);
-    Route::post('/employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('employees.toggle-status');
-    
-    // Product Management Routes
-    Route::resource('product-categories', ProductCategoryController::class);
-    Route::post('/product-categories/{productCategory}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('product-categories.toggle-status');
-    
-    Route::resource('product-types', ProductTypeController::class);
-    Route::post('/product-types/{productType}/toggle-status', [ProductTypeController::class, 'toggleStatus'])->name('product-types.toggle-status');
-    
-    Route::resource('products', ProductController::class);
-    Route::post('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
-    
-    // Expense Management Routes
-    Route::resource('expense-categories', ExpenseCategoryController::class);
-    Route::post('/expense-categories/{expenseCategory}/toggle-status', [ExpenseCategoryController::class, 'toggleStatus'])->name('expense-categories.toggle-status');
-    
-    Route::resource('expense-vouchers', ExpenseVoucherController::class);
-    
-    // Employee Module Routes (REST APIs + Web Views)
+    // Employee Module Routes (REST APIs + Web Views) - Must be before employees resource route
     Route::prefix('employees')->group(function () {
         // Attendance Routes
         Route::resource('attendances', EmployeeAttendanceController::class)->names([
@@ -110,4 +90,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('reports/employee', [EmployeeReportController::class, 'getEmployeeReport'])->name('employees.reports.employee');
         Route::get('reports/monthly', [EmployeeReportController::class, 'getMonthlyReport'])->name('employees.reports.monthly');
     });
+    
+    // Employee Management Routes (must be after nested routes)
+    Route::resource('employees', EmployeeController::class);
+    Route::post('/employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('employees.toggle-status');
+    
+    // Product Management Routes
+    Route::resource('product-categories', ProductCategoryController::class);
+    Route::post('/product-categories/{productCategory}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('product-categories.toggle-status');
+    
+    Route::resource('product-types', ProductTypeController::class);
+    Route::post('/product-types/{productType}/toggle-status', [ProductTypeController::class, 'toggleStatus'])->name('product-types.toggle-status');
+    
+    Route::resource('products', ProductController::class);
+    Route::post('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
+    
+    // Expense Management Routes
+    Route::resource('expense-categories', ExpenseCategoryController::class);
+    Route::post('/expense-categories/{expenseCategory}/toggle-status', [ExpenseCategoryController::class, 'toggleStatus'])->name('expense-categories.toggle-status');
+    
+    Route::resource('expense-vouchers', ExpenseVoucherController::class);
 });

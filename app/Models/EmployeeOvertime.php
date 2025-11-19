@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeOvertime extends Model
 {
+    protected $table = 'employee_overtime_hours';
+
     protected $fillable = [
         'employee_id',
         'date',

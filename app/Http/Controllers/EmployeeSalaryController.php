@@ -24,25 +24,26 @@ class EmployeeSalaryController extends Controller
     {
         $query = EmployeeSalary::with('employee');
 
-        // Filter by employee_id
-        if ($request->has('employee_id')) {
+        // Filter by employee_id (if provided)
+        if ($request->has('employee_id') && $request->employee_id) {
             $query->where('employee_id', $request->employee_id);
         }
 
         // Filter by month
-        if ($request->has('month')) {
+        if ($request->has('month') && $request->month) {
             $query->where('month', $request->month);
         }
 
         // Filter by date range (based on month)
-        if ($request->has('start_month')) {
+        if ($request->has('start_month') && $request->start_month) {
             $query->where('month', '>=', $request->start_month);
         }
-        if ($request->has('end_month')) {
+        if ($request->has('end_month') && $request->end_month) {
             $query->where('month', '<=', $request->end_month);
         }
 
-        $salaries = $query->orderBy('month', 'desc')->get();
+        // Auto-load all salaries by default (no filters applied if no parameters)
+        $salaries = $query->orderBy('month', 'desc')->orderBy('employee_id')->get();
         $employees = Employee::where('is_deleted', false)->where('status', 1)->orderBy('name')->get();
 
         // Return JSON for API requests

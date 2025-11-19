@@ -29,7 +29,7 @@ class EmployeeOvertimeController extends Controller
             $query->where('date', '<=', $request->end_date);
         }
 
-        $overtimes = $query->orderBy('date', 'desc')->get();
+        $overtimes = $query->orderBy('date', 'desc')->orderBy('created_at', 'desc')->get();
         $employees = Employee::where('is_deleted', false)->where('status', 1)->orderBy('name')->get();
 
         // Return JSON for API requests
@@ -87,13 +87,13 @@ class EmployeeOvertimeController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Overtime already exists for this employee on this date. Use update instead.'
-            ], 409);
+            // Update existing overtime
+            $existing->update(['ot_hours' => $request->ot_hours]);
+            $overtime = $existing->fresh();
+        } else {
+            // Create new overtime
+            $overtime = EmployeeOvertime::create($request->all());
         }
-
-        $overtime = EmployeeOvertime::create($request->all());
 
         return response()->json([
             'success' => true,

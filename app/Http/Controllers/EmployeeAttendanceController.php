@@ -35,7 +35,7 @@ class EmployeeAttendanceController extends Controller
             $query->where('status', $request->status);
         }
 
-        $attendances = $query->orderBy('date', 'desc')->get();
+        $attendances = $query->orderBy('date', 'desc')->orderBy('created_at', 'desc')->get();
         $employees = Employee::where('is_deleted', false)->where('status', 1)->orderBy('name')->get();
 
         // Return JSON for API requests
@@ -51,7 +51,7 @@ class EmployeeAttendanceController extends Controller
     }
 
     /**
-     * Show the form for creating a new attendance.
+     * Show the form for creating a new attendance. 
      */
     public function create(Request $request)
     {
@@ -76,7 +76,7 @@ class EmployeeAttendanceController extends Controller
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
-            'status' => 'required|in:present,absent,half_day',
+            'status' => 'required|in:present,absent,half_day,late',
         ]);
 
         if ($validator->fails()) {
@@ -93,13 +93,13 @@ class EmployeeAttendanceController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Attendance already exists for this employee on this date. Use update instead.'
-            ], 409);
+            // Update existing attendance
+            $existing->update(['status' => $request->status]);
+            $attendance = $existing->fresh();
+        } else {
+            // Create new attendance
+            $attendance = EmployeeAttendance::create($request->all());
         }
-
-        $attendance = EmployeeAttendance::create($request->all());
 
         return response()->json([
             'success' => true,
@@ -130,7 +130,7 @@ class EmployeeAttendanceController extends Controller
 
         $validator = Validator::make($request->all(), [
             'date' => 'sometimes|date',
-            'status' => 'sometimes|in:present,absent,half_day',
+            'status' => 'sometimes|in:present,absent,half_day,late',
         ]);
 
         if ($validator->fails()) {
