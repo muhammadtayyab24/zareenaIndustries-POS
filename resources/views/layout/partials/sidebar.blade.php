@@ -79,6 +79,23 @@
                         </div><!--end startbarCustomers-->
                     </li><!--end nav-item-->
                     <li class="nav-item">
+                        <a class="nav-link" href="#sidebarWarehouses" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="sidebarWarehouses">
+                            <i class="iconoir-store menu-icon"></i>
+                            <span>Warehouses</span>
+                        </a>
+                        <div class="collapse " id="sidebarWarehouses">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('warehouses.create') }}">Create</a>
+                                </li><!--end nav-item-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('warehouses.index') }}">View</a>
+                                </li><!--end nav-item-->
+                            </ul><!--end nav-->
+                        </div><!--end startbarWarehouses-->
+                    </li><!--end nav-item-->
+                    <li class="nav-item">
                         <a class="nav-link" href="#sidebarEmployees" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarEmployees">
                             <i class="iconoir-user-square menu-icon"></i>

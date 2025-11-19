@@ -17,6 +17,7 @@ use App\Http\Controllers\EmployeeAdvanceSalaryController;
 use App\Http\Controllers\EmployeeOvertimeController;
 use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\EmployeeReportController;
+use App\Http\Controllers\WarehouseController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -110,4 +111,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/expense-categories/{expenseCategory}/toggle-status', [ExpenseCategoryController::class, 'toggleStatus'])->name('expense-categories.toggle-status');
     
     Route::resource('expense-vouchers', ExpenseVoucherController::class);
+    
+    // Warehouse Management Routes
+    Route::resource('warehouses', WarehouseController::class);
+    Route::post('/warehouses/{warehouse}/toggle-status', [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
 });
