@@ -15,5 +15,10 @@ class Warehouse extends Model
         'status',
         'is_deleted',
     ];
+
+    public function stocks()
+    {
+        return $this->hasMany(WarehouseStock::class);
+    }
 }
 

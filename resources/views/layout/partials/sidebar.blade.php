@@ -190,6 +190,44 @@
                             </ul><!--end nav-->
                         </div><!--end startbarExpenseVouchers-->
                     </li><!--end nav-item-->
+                    <br>
+                    <li class="menu-label pt-0 mt-0">
+                        <span>Purchase Orders</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sidebarPurchaseOrdersNonTax" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="sidebarPurchaseOrdersNonTax">
+                            <i class="iconoir-receipt menu-icon"></i>
+                            <span>Purchase Order (Non-Tax)</span>
+                        </a>
+                        <div class="collapse " id="sidebarPurchaseOrdersNonTax">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('purchase-orders.non-tax.create') }}">Create</a>
+                                </li><!--end nav-item-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('purchase-orders.non-tax.index') }}">View</a>
+                                </li><!--end nav-item-->
+                            </ul><!--end nav-->
+                        </div><!--end startbarPurchaseOrdersNonTax-->
+                    </li><!--end nav-item-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sidebarPurchaseOrdersTax" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="sidebarPurchaseOrdersTax">
+                            <i class="iconoir-receipt menu-icon"></i>
+                            <span>Purchase Order (Tax)</span>
+                        </a>
+                        <div class="collapse " id="sidebarPurchaseOrdersTax">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('purchase-orders.tax.create') }}">Create</a>
+                                </li><!--end nav-item-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('purchase-orders.tax.index') }}">View</a>
+                                </li><!--end nav-item-->
+                            </ul><!--end nav-->
+                        </div><!--end startbarPurchaseOrdersTax-->
+                    </li><!--end nav-item-->
                  
                 </ul><!--end navbar-nav--->
                

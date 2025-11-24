@@ -43,7 +43,7 @@ class VendorController extends Controller
             'status' => ['sometimes', 'integer', 'in:0,1'],
         ]);
 
-        Vendor::create([
+        $vendor = Vendor::create([
             'name' => $validated['name'],
             'type' => $validated['type'],
             'contact' => $validated['contact'] ?? null,
@@ -53,6 +53,15 @@ class VendorController extends Controller
             'status' => $validated['status'] ?? 1, // Default to active if not provided
             'is_deleted' => false,
         ]);
+
+        // Return JSON response for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendor created successfully.',
+                'vendor' => $vendor
+            ]);
+        }
 
         return redirect()->route('vendors.index')->with('success', 'Vendor created successfully.');
     }

@@ -18,6 +18,7 @@ use App\Http\Controllers\EmployeeOvertimeController;
 use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\EmployeeReportController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\PurchaseOrderController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -115,4 +116,21 @@ Route::middleware(['auth'])->group(function () {
     // Warehouse Management Routes
     Route::resource('warehouses', WarehouseController::class);
     Route::post('/warehouses/{warehouse}/toggle-status', [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
+    
+    // Purchase Order Routes
+    Route::prefix('purchase-orders')->group(function () {
+        // Non-Tax Purchase Orders
+        Route::get('non-tax', [PurchaseOrderController::class, 'indexNonTax'])->name('purchase-orders.non-tax.index');
+        Route::get('non-tax/create', [PurchaseOrderController::class, 'createNonTax'])->name('purchase-orders.non-tax.create');
+        
+        // Tax Purchase Orders
+        Route::get('tax', [PurchaseOrderController::class, 'indexTax'])->name('purchase-orders.tax.index');
+        Route::get('tax/create', [PurchaseOrderController::class, 'createTax'])->name('purchase-orders.tax.create');
+        
+        // Common routes
+        Route::post('store', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
+        Route::get('product/unit-type', [PurchaseOrderController::class, 'getProductUnitType'])->name('purchase-orders.product.unit-type');
+        Route::get('{id}/print', [PurchaseOrderController::class, 'print'])->name('purchase-orders.print');
+        Route::get('{id}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    });
 });
