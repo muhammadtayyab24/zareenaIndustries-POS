@@ -65,7 +65,7 @@
             color: #495057;
             margin-right: 0.5rem;
         }
-</style>
+    </style>
 @endpush
 
 @section('content')
@@ -75,7 +75,7 @@
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">
-                    <h4 class="card-title">Create Purchase Order (Non-Tax)</h4>
+                            <h4 class="card-title">Create Purchase Order (Non-Tax)</h4>
                         </div>
                     </div>
                 </div>
@@ -103,10 +103,10 @@
                                             <label class="mb-2">GRN Number</label>
                                             <input type="text" class="form-control" id="grn_no" name="grn_no"
                                                 placeholder="Enter GRN Number">
-                            </div>
-                            </div>
-                        </div>
-                        
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="mb-2">Invoice Date <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="invoice_date" name="invoice_date"
@@ -129,18 +129,18 @@
                                             style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
                                             <!-- Vendor dropdown items will be populated here -->
                                         </div>
-                            </div>
-                        </div>
-                        
+                                    </div>
+                                </div>
+
                                 <!-- Empty area for credit ledger (to be added later) -->
                                 <div id="creditLedgerArea" class="mb-3" style="min-height: 100px;">
                                     <!-- Credit ledger will be added here later -->
-                            </div>
+                                </div>
                             </div>
                         </div>
-                        
+
                         <hr class="my-4">
-                        
+
                         <!-- Products Table -->
                         <h5 class="mb-3">Products</h5>
                         <div class="table-responsive">
@@ -164,18 +164,20 @@
                         <button type="button" class="btn btn-primary btn-sm mt-2" id="addProductBtn">
                             <i class="las la-plus"></i> Add Product
                         </button>
-                        
+
                         <hr class="my-4">
-                        
+
                         <!-- Totals Section -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="mb-2">Warehouse</label>
                                     <div class="position-relative">
-                                        <input type="text" class="form-control" id="warehouse_search" placeholder="Search warehouse..." autocomplete="off">
+                                        <input type="text" class="form-control" id="warehouse_search"
+                                            placeholder="Search warehouse..." autocomplete="off">
                                         <input type="hidden" id="warehouse_id" name="warehouse_id" value="">
-                                        <div id="warehouseDropdown" class="dropdown-menu position-absolute w-100" style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
+                                        <div id="warehouseDropdown" class="dropdown-menu position-absolute w-100"
+                                            style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
                                             <!-- Warehouse options -->
                                         </div>
                                     </div>
@@ -210,7 +212,7 @@
                                 </table>
                             </div>
                         </div>
-                        
+
                         <div class="row mt-4">
                             <div class="col-12 text-end">
                                 <button type="button" class="btn btn-secondary" id="printInvoiceBtn">
@@ -275,57 +277,59 @@
                     <button type="button" class="btn btn-primary" id="saveVendorBtn">
                         <i class="las la-save"></i> Save Vendor
                     </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="successModalLabel">
-                    <i class="las la-check-circle"></i> Success
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="mb-3">
-                    <i class="las la-check-circle text-success" style="font-size: 4rem;"></i>
                 </div>
-                <h4>Purchase Order Created Successfully!</h4>
-                <p class="text-muted">Your purchase order has been saved successfully.</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.href='{{ route('purchase-orders.non-tax.index') }}'">
-                    <i class="las la-list"></i> View All Orders
-                </button>
-                <button type="button" class="btn btn-primary" id="printInvoiceModalBtn">
-                    <i class="las la-print"></i> Print Invoice
-                </button>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="las la-check-circle"></i> Success
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="las la-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4>Purchase Order Created Successfully!</h4>
+                    <p class="text-muted">Your purchase order has been saved successfully.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        onclick="window.location.href='{{ route('purchase-orders.non-tax.index') }}'">
+                        <i class="las la-list"></i> View All Orders
+                    </button>
+                    <button type="button" class="btn btn-primary" id="printInvoiceModalBtn">
+                        <i class="las la-print"></i> Print Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/libs/mobius1-selectr/selectr.min.js') }}"></script>
     <script src="{{ asset('assets/libs/vanillajs-datepicker/js/datepicker-full.min.js') }}"></script>
-<script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Invoice Date Datepicker
             const invoiceDatePicker = new Datepicker(document.getElementById('invoice_date'), {
                 format: 'yyyy-mm-dd',
                 autohide: true
             });
-            
+
             // Set default to today's date
             const today = new Date();
-            const todayStr = today.getFullYear() + '-' + 
-                            String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                            String(today.getDate()).padStart(2, '0');
+            const todayStr = today.getFullYear() + '-' +
+                String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                String(today.getDate()).padStart(2, '0');
             document.getElementById('invoice_date').value = todayStr;
 
             // Vendor Search Functionality
@@ -435,7 +439,8 @@
 
                 function displayWarehouseDropdown() {
                     if (filteredWarehouses.length === 0) {
-                        warehouseDropdown.innerHTML = '<div class="dropdown-item-text text-muted">No warehouses found</div>';
+                        warehouseDropdown.innerHTML =
+                            '<div class="dropdown-item-text text-muted">No warehouses found</div>';
                     } else {
                         warehouseDropdown.innerHTML = filteredWarehouses.map(warehouse =>
                             `<a class="dropdown-item" href="#" data-warehouse-id="${warehouse.id}" data-warehouse-name="${warehouse.name}">
@@ -634,7 +639,8 @@
                 // Display product dropdown
                 function displayProductDropdown(index) {
                     if (filteredProducts.length === 0) {
-                        productDropdown.innerHTML = '<div class="dropdown-item-text text-muted">No products found</div>';
+                        productDropdown.innerHTML =
+                            '<div class="dropdown-item-text text-muted">No products found</div>';
                     } else {
                         productDropdown.innerHTML = filteredProducts.map(product =>
                             `<a class="dropdown-item" href="#" data-product-id="${product.id}" data-product-code="${product.id}" data-product-name="${product.product_name}" data-unit-type="${product.unit_type || ''}">
@@ -715,7 +721,7 @@
 
                 const qty = parseFloat(row.querySelector('.qty').value) || 0;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
-            const totalAmount = qty * price;
+                const totalAmount = qty * price;
 
                 row.querySelector('.total-amount').value = totalAmount.toFixed(2);
                 calculateTotals();
@@ -767,19 +773,19 @@
                     return;
                 }
 
-        // Validate products
-        let isValid = true;
-        productRows.forEach((row, index) => {
-            const productIdInput = row.querySelector('.product-id-input');
-            const productId = productIdInput ? productIdInput.value : '';
-            const qty = parseFloat(row.querySelector('.qty').value) || 0;
-            const price = parseFloat(row.querySelector('.price').value) || 0;
+                // Validate products
+                let isValid = true;
+                productRows.forEach((row, index) => {
+                    const productIdInput = row.querySelector('.product-id-input');
+                    const productId = productIdInput ? productIdInput.value : '';
+                    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                    const price = parseFloat(row.querySelector('.price').value) || 0;
 
-            if (!productId) {
-                alert(`Please select a product for row ${index + 1}`);
-                isValid = false;
-                return;
-            }
+                    if (!productId) {
+                        alert(`Please select a product for row ${index + 1}`);
+                        isValid = false;
+                        return;
+                    }
                     if (qty <= 0 || qty % 1 !== 0) {
                         alert(`Please enter valid integer quantity for row ${index + 1}`);
                         isValid = false;
@@ -826,12 +832,12 @@
 
                 try {
                     const response = await fetch('{{ route('purchase-orders.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
                         body: JSON.stringify(data)
                     });
 
@@ -839,7 +845,8 @@
 
                     if (result.success) {
                         // Store purchase ID for printing
-                        const purchaseId = result.data?.id || result.data?.purchase_id || result.data?.data?.id;
+                        const purchaseId = result.data?.id || result.data?.purchase_id || result.data
+                            ?.data?.id;
                         if (purchaseId) {
                             window.purchaseId = purchaseId;
                         } else {
@@ -849,17 +856,18 @@
                                 window.purchaseId = data.id;
                             }
                         }
-                        
+
                         // Show success modal
-                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        const successModal = new bootstrap.Modal(document.getElementById(
+                            'successModal'));
                         successModal.show();
-                        
+
                         // Reset form
                         document.getElementById('purchaseOrderForm').reset();
                         document.getElementById('productsTableBody').innerHTML = '';
                         productRowIndex = 0;
                         addProductRow();
-                        
+
                         // Reset save button
                         saveBtn.disabled = false;
                         saveBtn.innerHTML = '<i class="las la-save"></i> Save Only';
@@ -884,7 +892,7 @@
                     alert('Please save the purchase order first');
                 }
             });
-            
+
             // Print invoice button (from success modal)
             document.getElementById('printInvoiceModalBtn').addEventListener('click', function() {
                 if (window.purchaseId) {
@@ -894,6 +902,6 @@
 
             // Add initial product row
             addProductRow();
-});
-</script>
+        });
+    </script>
 @endpush

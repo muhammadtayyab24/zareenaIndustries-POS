@@ -81,7 +81,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarWarehouses" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarWarehouses">
-                            <i class="iconoir-store menu-icon"></i>
+                            <i class="las la-warehouse menu-icon"></i>
                             <span>Warehouses</span>
                         </a>
                         <div class="collapse " id="sidebarWarehouses">
@@ -132,19 +132,17 @@
                         <span>Product Management</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('product-categories.index') }}" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarProductCategories">
+                        <a class="nav-link" href="{{ route('product-categories.index') }}">
                             <i class="iconoir-folder menu-icon"></i>
                             <span>Product Categories</span>
                         </a>
                     </li><!--end nav-item-->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('product-types.index') }}" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarProductTypes">
-                            <i class="iconoir-tag menu-icon"></i>
-                            <span>Product Types</span>
-                        </a>
-                    </li><!--end nav-item-->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('product-types.index') }}">
+                                <i class="iconoir-cube menu-icon"></i>
+                                <span>Product Types</span>
+                            </a>
+                        </li><!--end nav-item-->
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarProducts">
@@ -167,8 +165,7 @@
                         <span>Expense Management</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('expense-categories.index') }}" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarExpenseCategories">
+                        <a class="nav-link" href="{{ route('expense-categories.index') }}">
                             <i class="iconoir-folder menu-icon"></i>
                             <span>Expense Categories</span>
                         </a>
@@ -176,7 +173,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarExpenseVouchers" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarExpenseVouchers">
-                            <i class="iconoir-receipt menu-icon"></i>
+                            <i class="iconoir-money-square menu-icon"></i>
                             <span>Expense Vouchers</span>
                         </a>
                         <div class="collapse " id="sidebarExpenseVouchers">
@@ -197,8 +194,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarPurchaseOrdersNonTax" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarPurchaseOrdersNonTax">
-                            <i class="iconoir-receipt menu-icon"></i>
-                            <span>Purchase Order (Non-Tax)</span>
+                            <i class="las la-receipt menu-icon text-primary"></i>
+                            <span>Purchase Invoice (Non-Tax)</span>
                         </a>
                         <div class="collapse " id="sidebarPurchaseOrdersNonTax">
                             <ul class="nav flex-column">
@@ -214,8 +211,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarPurchaseOrdersTax" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarPurchaseOrdersTax">
-                            <i class="iconoir-receipt menu-icon"></i>
-                            <span>Purchase Order (Tax)</span>
+                            <i class="las la-file-invoice-dollar menu-icon text-success"></i>
+                            <span>Purchase Invoice (Tax)</span>
                         </a>
                         <div class="collapse " id="sidebarPurchaseOrdersTax">
                             <ul class="nav flex-column">

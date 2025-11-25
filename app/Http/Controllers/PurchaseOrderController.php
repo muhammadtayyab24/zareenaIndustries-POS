@@ -11,6 +11,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderController extends Controller
 {
@@ -247,8 +248,9 @@ class PurchaseOrderController extends Controller
     public function print($id)
     {
         $purchase = Purchase::with(['vendor', 'warehouse', 'products.product'])->findOrFail($id);
+        $printedBy = Auth::user();
         
-        return view('pages.purchase-orders.print', compact('purchase'));
+        return view('pages.purchase-orders.print', compact('purchase', 'printedBy'));
     }
 }
 
