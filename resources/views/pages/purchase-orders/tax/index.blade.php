@@ -46,10 +46,10 @@
                                     <td><strong>{{ number_format($purchase->grand_total, 2) }}</strong></td>
                                     <td>{{ $purchase->created_at->format('Y-m-d') }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('purchase-orders.show', $purchase->id) }}" 
-                                           class="btn btn-sm btn-info" data-bs-toggle="tooltip" 
-                                           data-bs-placement="top" title="View">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{{ route('purchase-orders.print', $purchase->id) }}" 
+                                           class="btn btn-sm btn-primary" data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" title="Print" target="_blank">
+                                            <i class="fas fa-print"></i>
                                         </a>
                                     </td>
                                 </tr>

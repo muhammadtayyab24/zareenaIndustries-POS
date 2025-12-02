@@ -13,9 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Call UserSeeder to create default users
+        // Call seeders in order (respecting dependencies)
         $this->call([
             UserSeeder::class,
+            ProductCategorySeeder::class,
+            ProductTypeSeeder::class,
+            ProductSeeder::class,
+            VendorSeeder::class,
+            WarehouseSeeder::class,
         ]);
     }
 }

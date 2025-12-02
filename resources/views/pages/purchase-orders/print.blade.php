@@ -14,13 +14,20 @@
             @page {
                 margin: 10mm;
             }
+
+            /* Force colors to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
         }
 
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: #fff;
         }
 
@@ -33,8 +40,6 @@
 
         .invoice-header {
             text-align: center;
-
-            border-bottom: 2px solid #000;
             padding-bottom: 10px;
         }
 
@@ -80,7 +85,6 @@
 
         .vendor-info {
             margin: 20px 0;
-            border: 1px solid #000;
             padding: 10px;
         }
 
@@ -88,7 +92,6 @@
             margin: 0 0 10px 0;
             font-size: 14px;
             text-transform: uppercase;
-            border-bottom: 1px solid #000;
             padding-bottom: 5px;
         }
 
@@ -116,15 +119,25 @@
 
         .products-table th,
         .products-table td {
-            border: 1px solid #000;
             padding: 8px;
             text-align: left;
         }
 
         .products-table th {
-            background-color: #f0f0f0;
+            background-color: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
             text-align: center;
+        }
+
+        .products-table tr {
+            border-bottom: 1px solid #000;
+        }
+
+        .products-table tfoot tr {
+            border-bottom: none;
         }
 
         .products-table td {
@@ -161,7 +174,6 @@
 
         .summary-table td {
             padding: 8px;
-            border: 1px solid #000;
         }
 
         .summary-table td:first-child {
@@ -175,8 +187,19 @@
         }
 
         .summary-table .total-row {
-            background-color: #f0f0f0;
+            background-color: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
             font-weight: bold;
+        }
+
+        .summary-table tr {
+            border-bottom: 1px solid #000;
+        }
+
+        .summary-table tr:last-child {
+            border-bottom: none;
         }
 
         .amount-in-words {
@@ -184,7 +207,7 @@
         }
 
         .signatures {
-            margin-top: 40px;
+            margin-top: 10px;
             display: flex;
             justify-content: space-between;
         }
@@ -195,8 +218,7 @@
         }
 
         .signature-line {
-            border-top: 1px solid #000;
-            margin-top: 50px;
+            margin-top: 30px;
             padding-top: 5px;
         }
 
@@ -230,21 +252,29 @@
         </div>
 
         <div class="invoice-header">
-            <h1>Zareena Industries</h1>
+            <h1>ZAREENA INDUSTRIES</h1>
             <div class="company-info">
-                {{--  <p><strong>ZAREENA INDUSTRIES</strong></p>  --}}
-                <p>Address: Plot #D 27 Manghopir Road S.I.T.E Karachi.</p>
-                <p>Tel: +92-301-8203399 - +92-304-3558424 | E-Mail: info@zareenaindustries.com</p>
+                <p>D-27 Manghopir Road, S.I.T.E. Karachi.</p>
+                <p>Tel: 92-021-32588033 | E-Mail: info@zareenaindustries.com</p>
+                @if ($purchase->type === 'tax')
+                    <p>N.T.N.: 3238408-4 | S.T.R.N: 17-00-3238-408-14</p>
+                @endif
             </div>
         </div>
 
         <div class="invoice-details">
             <div class="invoice-details-left">
                 <div style="margin-bottom: 10px;">
-                    <table style="width:80%; margin:0 auto; border-collapse:collapse; background:#f0f0f0; border-radius: 5px;">
+                    <table
+                        style="width:100%; margin:0 auto; border-collapse:collapse; background:#f0f0f0 !important; border-radius: 5px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">
                         <tr>
-                            <td colspan="2" style="text-align:center; font-size:13px; font-weight:bold; padding:5px 0 2px 0; letter-spacing:1px;">
-                                PURCHASE INVOICE
+                            <td colspan="2"
+                                style="text-align:center; font-size:13px; font-weight:bold; padding:5px 0 2px 0; letter-spacing:1px;">
+                                @if ($purchase->type === 'tax')
+                                    PURCHASE INVOICE (SALES TAX)
+                                @else
+                                    PURCHASE INVOICE
+                                @endif
                             </td>
                         </tr>
                         <tr>
@@ -260,7 +290,11 @@
                                 {{ $purchase->id }}
                             </td>
                             <td style="width:40%; text-align:center; font-size:12px; font-weight:bold;">
-                                {{ $purchase->created_at->format('d-m-Y') }}
+                                @if ($purchase->type === 'tax' && $purchase->due_date)
+                                    {{ $purchase->due_date->format('d-m-Y') }}
+                                @else
+                                    {{ $purchase->created_at->format('d-m-Y') }}
+                                @endif
                             </td>
                         </tr>
                     </table>
@@ -269,15 +303,42 @@
                     <span class="detail-label">Vendor Invoice No:</span>
                     <span class="detail-value">{{ $purchase->vendor_invoice_no }}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Vendor Invoice Date:</span>
-                    <span
-                        class="detail-value">{{ $purchase->due_date ? $purchase->due_date->format('d-m-Y') : $purchase->created_at->format('d-m-Y') }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">GRN No:</span>
-                    <span class="detail-value">{{ $purchase->grn_no ?? 'N/A' }}</span>
-                </div>
+                @if ($purchase->type === 'tax')
+                    <div class="detail-row">
+                        <span class="detail-label">Purchase Order No:</span>
+                        <span class="detail-value"> _______________________ </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Purchase Order Date:</span>
+                        <span class="detail-value"> _______________________ </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Delivery Challan No:</span>
+                        <span class="detail-value"> _______________________ </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Delivery Challan Date:</span>
+                        <span class="detail-value"> _______________________ </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Due Date:</span>
+                        <span class="detail-value"> _______________________ </span>
+                    </div>
+                @else
+                    <div class="detail-row">
+                        <span class="detail-label">PO Number:</span>
+                        <span class="detail-value">{{ $purchase->po_no ?? ' _______________________ ' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">GRN Number:</span>
+                        <span class="detail-value">{{ $purchase->grn_no ?? ' _______________________ ' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Vendor Invoice Date:</span>
+                        <span
+                            class="detail-value">{{ $purchase->due_date ? $purchase->due_date->format('d-m-Y') : $purchase->created_at->format('d-m-Y') ?? ' _______________________ ' }}</span>
+                    </div>
+                @endif
             </div>
             <div class="invoice-details-right">
                 <h3>Vendor Details</h3>
@@ -293,10 +354,41 @@
                     <span class="vendor-detail-label">Address:</span>
                     <span>{{ $purchase->vendor->address ?? 'N/A' }}</span>
                 </div>
-                <div class="detail-row">
-                    <span class="vendor-detail-label">Contact:</span>
-                    <span>{{ $purchase->vendor->contact ?? 'N/A' }}</span>
-                </div>
+                @if ($purchase->type === 'tax')
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">Phone:</span>
+                        <span>{{ $purchase->vendor->contact ?? '' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">N.T.N.:</span>
+                        <span>{{ $purchase->vendor->ntn ?? '' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">C.N.I.C. No.:</span>
+                        <span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">S.T.R.N.:</span>
+                        <span>{{ $purchase->vendor->strn ?? '' }}</span>
+                    </div>
+                @else
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">Phone:</span>
+                        <span>{{ $purchase->vendor->contact ?? '' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">N.T.N.:</span>
+                        <span>{{ $purchase->vendor->ntn ?? '' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">C.N.I.C. No.:</span>
+                        <span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="vendor-detail-label">S.T.R.N.:</span>
+                        <span>{{ $purchase->vendor->strn ?? '' }}</span>
+                    </div>
+                @endif
 
 
                 {{--  <div class="detail-row">
@@ -323,11 +415,18 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">S.No.</th>
-                    <th style="width: 40%;">Product Name</th>
-                    <th style="width: 10%;">Unit</th>
-                    <th style="width: 10%;">Quantity</th>
-                    <th style="width: 12%;">Rate</th>
-                    <th style="width: 13%;">Amount</th>
+                    <th style="width: @if ($purchase->type === 'tax') 25% @else 40% @endif;">Description</th>
+                    <th style="width: 8%;">Quantity</th>
+                    <th style="width: 8%;">Unit</th>
+                    <th style="width: 10%;">Rate</th>
+                    @if ($purchase->type === 'tax')
+                        <th style="width: 12%;">Amt. Exc. Sales Tax</th>
+                        <th style="width: 10%;">Sales Tax Rate</th>
+                        <th style="width: 12%;">Sales Tax Amount</th>
+                        <th style="width: 10%;">Amt. Inc. Sales Tax</th>
+                    @else
+                        <th style="width: 13%;">Amount</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -335,23 +434,39 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>{{ $purchaseProduct->product->product_name ?? 'N/A' }}</td>
-                        <td class="text-center">{{ $purchaseProduct->unit_type ?? 'N/A' }}</td>
                         <td class="text-center">{{ number_format($purchaseProduct->qty, 2) }}</td>
+                        <td class="text-center">{{ $purchaseProduct->unit_type ?? 'N/A' }}</td>
                         <td>{{ number_format($purchaseProduct->price, 2) }}</td>
-                        <td>{{ number_format($purchaseProduct->total_amount, 2) }}</td>
+                        @if ($purchase->type === 'tax')
+                            <td>{{ number_format($purchaseProduct->net_amount ?? $purchaseProduct->qty * $purchaseProduct->price, 2) }}
+                            </td>
+                            <td class="text-center">{{ number_format($purchaseProduct->gst_percentage ?? 0, 2) }}%</td>
+                            <td>{{ number_format($purchaseProduct->gst_amount ?? 0, 2) }}</td>
+                            <td>{{ number_format($purchaseProduct->total_amount, 2) }}</td>
+                        @else
+                            <td>{{ number_format($purchaseProduct->total_amount, 2) }}</td>
+                        @endif
                     </tr>
                 @endforeach
+
             </tbody>
             <tfoot>
                 <tr>
                     <td colspan="2" class="text-right"><strong>Total:</strong></td>
-                    <td class="text-center">-</td>
                     <td class="text-center"><strong>{{ number_format($purchase->products->sum('qty'), 2) }}</strong>
                     </td>
                     <td class="text-center">-</td>
-                    <td class="text-right">
-                        <strong>{{ number_format($purchase->products->sum('total_amount'), 2) }}</strong>
-                    </td>
+                    <td class="text-center">-</td>
+                    @if ($purchase->type === 'tax')
+                        <td class="text-right"><strong>{{ number_format($purchase->subtotal, 2) }}</strong></td>
+                        <td class="text-center">-</td>
+                        <td class="text-right"><strong>{{ number_format($purchase->total_gst, 2) }}</strong></td>
+                        <td class="text-right">
+                            <strong>{{ number_format($purchase->products->sum('total_amount'), 2) }}</strong></td>
+                    @else
+                        <td class="text-right">
+                            <strong>{{ number_format($purchase->products->sum('total_amount'), 2) }}</strong></td>
+                    @endif
                 </tr>
             </tfoot>
         </table>
@@ -362,24 +477,30 @@
             </div>
             <div class="summary-right">
                 <table class="summary-table">
-                    <tr>
-                        <td>Totals (Amount):</td>
-                        <td>{{ number_format($purchase->subtotal, 2) }}</td>
-                    </tr>
                     @if ($purchase->type === 'tax')
                         <tr>
-                            <td>Total GST:</td>
-                            <td>{{ number_format($purchase->total_gst, 2) }}</td>
+                            <td>Adv. Inc. Tax:</td>
+                            <td>{{ number_format($purchase->adv_inc_tax_percentage ?? 0, 2) }}% Rs.
+                                {{ number_format($purchase->adv_inc_tax_amount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Carriage and Freight:</td>
+                            <td>Rs. {{ number_format($purchase->freight_charges, 2) }}</td>
+                        </tr>
+                    @else
+                        <tr>
+                            <td>Totals (Amount):</td>
+                            <td>{{ number_format($purchase->subtotal, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Carriage and Freight:</td>
+                            <td>{{ number_format($purchase->freight_charges, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Labour Charges:</td>
+                            <td>{{ number_format($purchase->labour_charges, 2) }}</td>
                         </tr>
                     @endif
-                    <tr>
-                        <td>Carriage and Freight:</td>
-                        <td>{{ number_format($purchase->freight_charges, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Labour Charges:</td>
-                        <td>{{ number_format($purchase->labour_charges, 2) }}</td>
-                    </tr>
                     <tr class="total-row">
                         <td>Net Total:</td>
                         <td>Rs. {{ number_format($purchase->grand_total, 2) }}</td>
@@ -486,6 +607,9 @@
         <div class="signatures">
             <div class="signature-box">
                 <div class="signature-line">
+                    <div style="margin-bottom: 5px;">
+                        <span style="font-size: 18px;">__________________________ </span>
+                    </div>
                     <strong>Signature</strong>
                 </div>
                 <p style="text-align: left;">Printed By: <strong>{{ Auth::user()->name ?? 'N/A' }}</strong></p>
@@ -493,7 +617,6 @@
             </div>
             <div class="signature-box">
             </div>
-
         </div>
     </div>
     {{--  <div style="text-align: center;font-size: 10px; color: #666; position: fixed; bottom: 10px; left: 0; width: 100%;">

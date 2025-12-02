@@ -81,6 +81,8 @@ class PurchaseOrderController extends Controller
             'invoice_date' => 'required|date',
             'labour_charges' => 'nullable|numeric|min:0',
             'freight_charges' => 'nullable|numeric|min:0',
+            'adv_inc_tax_percentage' => 'nullable|numeric|min:0|max:100',
+            'adv_inc_tax_amount' => 'nullable|numeric|min:0',
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.qty' => 'required|numeric|min:0.01',
@@ -123,7 +125,17 @@ class PurchaseOrderController extends Controller
             
             $labourCharges = floatval($data['labour_charges'] ?? 0);
             $freightCharges = floatval($data['freight_charges'] ?? 0);
-            $grandTotal = $subtotal + $totalGst + $labourCharges + $freightCharges;
+            $advIncTaxPercentage = floatval($data['adv_inc_tax_percentage'] ?? 0);
+            $advIncTaxAmount = floatval($data['adv_inc_tax_amount'] ?? 0);
+            
+            // Calculate grand total based on type
+            if ($type === 'tax') {
+                // For tax: subtotal + totalGst + advIncTaxAmount + freightCharges
+                $grandTotal = $subtotal + $totalGst + $advIncTaxAmount + $freightCharges;
+            } else {
+                // For non-tax: subtotal + labourCharges + freightCharges
+                $grandTotal = $subtotal + $labourCharges + $freightCharges;
+            }
             
             // Create purchase
             $purchase = Purchase::create([
@@ -134,9 +146,11 @@ class PurchaseOrderController extends Controller
                 'po_no' => $data['po_no'] ?? null,
                 'grn_no' => $data['grn_no'] ?? null,
                 'credit_term' => $data['credit_term'] ?? null,
-                'due_date' => $data['invoice_date'] ?? null, // Using due_date field to store invoice_date
+                'due_date' => $data['invoice_date'] ?? null,
                 'labour_charges' => $labourCharges,
                 'freight_charges' => $freightCharges,
+                'adv_inc_tax_percentage' => $advIncTaxPercentage,
+                'adv_inc_tax_amount' => $advIncTaxAmount,
                 'subtotal' => $subtotal,
                 'total_gst' => $totalGst,
                 'grand_total' => $grandTotal,

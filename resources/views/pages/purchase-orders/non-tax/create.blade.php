@@ -151,7 +151,7 @@
                                         <th style="width: 30%;">Product</th>
                                         <th style="width: 12%;">Unit Type</th>
                                         <th style="width: 10%;">Qty</th>
-                                        <th style="width: 12%;">Price</th>
+                                        <th style="width: 12%;">Rate</th>
                                         <th style="width: 18%;">Total Amount</th>
                                         <th style="width: 8%;">Action</th>
                                     </tr>
@@ -215,11 +215,11 @@
 
                         <div class="row mt-4">
                             <div class="col-12 text-end">
-                                <button type="button" class="btn btn-secondary" id="printInvoiceBtn">
+                                {{--  <button type="button" class="btn btn-secondary" id="printInvoiceBtn">
                                     <i class="las la-print"></i> Print Invoice
-                                </button>
+                                </button>  --}}
                                 <button type="submit" class="btn btn-primary" id="saveBtn">
-                                    <i class="las la-save"></i> Save Only
+                                    <i class="las la-save"></i> Save
                                 </button>
                             </div>
                         </div>
