@@ -1,0 +1,998 @@
+@extends('layout.app')
+
+@section('title', 'Create Sales Order (Non-Tax) | Zareena Industries')
+
+@push('styles')
+    <link href="{{ asset('assets/libs/mobius1-selectr/selectr.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/vanillajs-datepicker/css/datepicker.min.css') }}" rel="stylesheet" type="text/css" />
+    <style>
+        #customerDropdown {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            background-color: #fff;
+        }
+
+        #customerDropdown .dropdown-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        #customerDropdown .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        #warehouseDropdown {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            background-color: #fff;
+        }
+
+        #warehouseDropdown .dropdown-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        #warehouseDropdown .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        #creditLedgerArea {
+            border: 1px dashed #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        .product-dropdown {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            background-color: #fff;
+        }
+
+        .product-dropdown .dropdown-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        .product-dropdown .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .product-dropdown .dropdown-item strong {
+            color: #495057;
+            margin-right: 0.5rem;
+        }
+    </style>
+@endpush
+
+@section('content')
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title">Create Sales Order (Non-Tax)</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <form id="salesOrderForm">
+                        @csrf
+                        <input type="hidden" name="type" value="non_tax">
+
+                        <!-- Top Invoice Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="mb-2">Invoice Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="invoice_no"
+                                        name="invoice_no" value="{{ $nextInvoiceNo ?? '' }}" placeholder="Enter Invoice Number" required>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="flex-grow-1">
+                                            <label class="mb-2">PO Number</label>
+                                            <input type="text" class="form-control" id="po_no" name="po_no"
+                                                placeholder="Enter PO Number" maxlength="255">
+                                        </div>
+                                        <div class="flex-grow-1 ms-2">
+                                            <label class="mb-2">DC Number</label>
+                                            <input type="text" class="form-control" id="dc_no" name="dc_no"
+                                                placeholder="Enter DC Number">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="mb-2">Invoice Date <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="invoice_date" name="invoice_date"
+                                        placeholder="Select Invoice Date" readonly required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="mb-2">Due Date</label>
+                                    <input type="text" class="form-control" id="due_date" name="due_date"
+                                        placeholder="Select Due Date" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="mb-2">Customer <span class="text-danger">*</span></label>
+                                    <div class="input-group position-relative">
+                                        <input type="text" class="form-control" id="customer_search" name="customer_search"
+                                            placeholder="Search customer..." autocomplete="off">
+                                        <input type="hidden" id="customer_id" name="customer_id" required>
+                                        <button type="button" class="btn btn-primary" id="addCustomerBtn"
+                                            title="Add New Customer">
+                                            <i class="las la-plus"></i>
+                                        </button>
+                                        <div id="customerDropdown" class="dropdown-menu position-absolute w-100"
+                                            style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
+                                            <!-- Customer dropdown items will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="mb-2">Order Taker</label>
+                                    <select class="form-select" id="order_taker_id" name="order_taker_id">
+                                        <option value="">Select Order Taker</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="mb-2">Salesman</label>
+                                    <select class="form-select" id="salesman_id" name="salesman_id">
+                                        <option value="">Select Salesman (Optional)</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <!-- Customer Ledger Area -->
+                                <div id="customerLedgerArea" class="mb-3" style="display: none; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem; background-color: #f8f9fa;">
+                                    <h6 class="mb-2">Customer Ledger</h6>
+                                    <div id="ledgerContent">
+                                        <!-- Ledger content will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Products Table -->
+                        <h5 class="mb-3">Products</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="productsTable"
+                                style="table-layout: fixed; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Product</th>
+                                        <th style="width: 12%;">Unit Type</th>
+                                        <th style="width: 10%;">Qty</th>
+                                        <th style="width: 12%;">Rate</th>
+                                        <th style="width: 18%;">Total Amount</th>
+                                        <th style="width: 8%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody">
+                                    <!-- Product rows will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm mt-2" id="addProductBtn">
+                            <i class="las la-plus"></i> Add Product
+                        </button>
+
+                        <hr class="my-4">
+
+                        <!-- Totals Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="mb-2">Warehouse</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" id="warehouse_search"
+                                            placeholder="Search warehouse..." autocomplete="off">
+                                        <input type="hidden" id="warehouse_id" name="warehouse_id" value="">
+                                        <div id="warehouseDropdown" class="dropdown-menu position-absolute w-100"
+                                            style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
+                                            <!-- Warehouse options -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-end" id="subtotal">0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Freight Charges:</strong></td>
+                                        <td class="text-end">
+                                            <input type="number" class="form-control text-end" id="freight_charges"
+                                                name="freight_charges" value="0" min="0" step="0.01"
+                                                style="width: 100%;">
+                                        </td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <td><strong>Grand Total:</strong></td>
+                                        <td class="text-end"><strong id="grandTotal">0.00</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12 text-end">
+                                {{--  <button type="button" class="btn btn-secondary" id="printInvoiceBtn">
+                                    <i class="las la-print"></i> Print Invoice
+                                </button>  --}}
+                                <button type="submit" class="btn btn-primary" id="saveBtn">
+                                    <i class="las la-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCustomerModalLabel">Add New Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCustomerForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="customer_name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="customer_name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_type" class="form-label">Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="customer_type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_contact" class="form-label">Contact</label>
+                            <input type="text" class="form-control" id="customer_contact" name="contact">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_ntn" class="form-label">NTN</label>
+                            <input type="text" class="form-control" id="customer_ntn" name="ntn">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="customer_email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer_address" class="form-label">Address</label>
+                            <textarea class="form-control" id="customer_address" name="address" rows="3"></textarea>
+                        </div>
+                        <input type="hidden" name="status" value="1">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveCustomerBtn">
+                        <i class="las la-save"></i> Save Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="las la-check-circle"></i> Success
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="las la-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4>Sales Order Created Successfully!</h4>
+                    <p class="text-muted">Your sales order has been saved successfully.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        onclick="window.location.href='{{ route('sales-orders.non-tax.index') }}'">
+                        <i class="las la-list"></i> View All Orders
+                    </button>
+                    <button type="button" class="btn btn-primary" id="printInvoiceModalBtn">
+                        <i class="las la-print"></i> Print Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/libs/mobius1-selectr/selectr.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/vanillajs-datepicker/js/datepicker-full.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Invoice Date Datepicker
+            const invoiceDatePicker = new Datepicker(document.getElementById('invoice_date'), {
+                format: 'yyyy-mm-dd',
+                autohide: true
+            });
+
+            // Initialize Due Date Datepicker
+            const dueDatePicker = new Datepicker(document.getElementById('due_date'), {
+                format: 'yyyy-mm-dd',
+                autohide: true
+            });
+
+            // Set default to today's date
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' +
+                String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                String(today.getDate()).padStart(2, '0');
+            document.getElementById('invoice_date').value = todayStr;
+
+            // Customer Search Functionality
+            const customerSearch = document.getElementById('customer_search');
+            const customerIdInput = document.getElementById('customer_id');
+            const customerDropdown = document.getElementById('customerDropdown');
+            const customers = @json($customers);
+            const warehousesList = @json($warehouses);
+            let filteredCustomers = customers;
+
+            // Filter customers based on search
+            function filterCustomers(query) {
+                if (!query || query.trim() === '') {
+                    filteredCustomers = customers;
+                    customerDropdown.style.display = 'none';
+                    return;
+                }
+
+                const searchTerm = query.toLowerCase();
+                filteredCustomers = customers.filter(customer =>
+                    customer.name.toLowerCase().includes(searchTerm) ||
+                    (customer.contact && customer.contact.toLowerCase().includes(searchTerm)) ||
+                    (customer.email && customer.email.toLowerCase().includes(searchTerm))
+                );
+
+                displayCustomerDropdown();
+            }
+
+            // Display customer dropdown
+            function displayCustomerDropdown() {
+                if (filteredCustomers.length === 0) {
+                    customerDropdown.innerHTML = '<div class="dropdown-item-text text-muted">No customers found</div>';
+                } else {
+                    customerDropdown.innerHTML = filteredCustomers.map(customer =>
+                        `<a class="dropdown-item" href="#" data-customer-id="${customer.id}" data-customer-name="${customer.name}">${customer.name}</a>`
+                    ).join('');
+                }
+
+                customerDropdown.style.display = 'block';
+
+                // Add click handlers to dropdown items
+                customerDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const customerId = this.dataset.customerId;
+                        const customerName = this.dataset.customerName;
+                        customerSearch.value = customerName;
+                        customerIdInput.value = customerId;
+                        customerDropdown.style.display = 'none';
+                    });
+                });
+            }
+
+            // Handle customer search input
+            customerSearch.addEventListener('input', function() {
+                filterCustomers(this.value);
+            });
+
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!customerSearch.contains(e.target) && !customerDropdown.contains(e.target)) {
+                    customerDropdown.style.display = 'none';
+                }
+            });
+
+            // Clear customer selection when search is cleared
+            customerSearch.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (!customerIdInput.value) {
+                        customerSearch.value = '';
+                        // Hide ledger area
+                        document.getElementById('customerLedgerArea').style.display = 'none';
+                    }
+                }, 200);
+            });
+            
+            // Load customer ledger function
+            async function loadCustomerLedger(customerId) {
+                if (!customerId) {
+                    document.getElementById('customerLedgerArea').style.display = 'none';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`{{ route('sales-orders.customer.ledger') }}?customer_id=${customerId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        const ledgerArea = document.getElementById('customerLedgerArea');
+                        const ledgerContent = document.getElementById('ledgerContent');
+                        
+                        let html = `
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">Customer Type:</small><br>
+                                    <strong>${result.customer.type}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Total Sales:</small><br>
+                                    <strong>Rs. ${result.total_sales}</strong>
+                                </div>
+                            </div>
+                        `;
+                        
+                        if (result.customer.type === 'Credit' && parseFloat(result.balance_raw) > 0) {
+                            html += `
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">Outstanding Balance:</small><br>
+                                        <strong class="text-danger">Rs. ${result.balance}</strong>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (result.customer.type === 'Credit' && parseFloat(result.balance_raw) === 0) {
+                            html += `
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">Outstanding Balance:</small><br>
+                                        <strong class="text-success">Rs. 0.00 (No Balance)</strong>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        ledgerContent.innerHTML = html;
+                        ledgerArea.style.display = 'block';
+                    } else {
+                        document.getElementById('customerLedgerArea').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error loading customer ledger:', error);
+                    document.getElementById('customerLedgerArea').style.display = 'none';
+                }
+            }
+
+            // Warehouse Search Functionality
+            const warehouseSearch = document.getElementById('warehouse_search');
+            const warehouseIdInput = document.getElementById('warehouse_id');
+            const warehouseDropdown = document.getElementById('warehouseDropdown');
+            let filteredWarehouses = warehousesList;
+
+            if (warehouseSearch && warehouseDropdown) {
+                // Populate search field if a warehouse is already selected (e.g., old input)
+                if (warehouseIdInput.value) {
+                    const existingWarehouse = warehousesList.find(
+                        warehouse => warehouse.id == warehouseIdInput.value
+                    );
+                    if (existingWarehouse) {
+                        warehouseSearch.value = existingWarehouse.name;
+                    }
+                }
+
+                function filterWarehouses(query) {
+                    if (!query || query.trim() === '') {
+                        filteredWarehouses = warehousesList;
+                        warehouseDropdown.style.display = 'none';
+                        return;
+                    }
+
+                    const term = query.toLowerCase();
+                    filteredWarehouses = warehousesList.filter(warehouse =>
+                        warehouse.name.toLowerCase().includes(term) ||
+                        warehouse.id.toString().includes(term)
+                    );
+
+                    displayWarehouseDropdown();
+                }
+
+                function displayWarehouseDropdown() {
+                    if (filteredWarehouses.length === 0) {
+                        warehouseDropdown.innerHTML =
+                            '<div class="dropdown-item-text text-muted">No warehouses found</div>';
+                    } else {
+                        warehouseDropdown.innerHTML = filteredWarehouses.map(warehouse =>
+                            `<a class="dropdown-item" href="#" data-warehouse-id="${warehouse.id}" data-warehouse-name="${warehouse.name}">
+                                ${warehouse.name}
+                            </a>`
+                        ).join('');
+                    }
+
+                    warehouseDropdown.style.display = 'block';
+
+                    warehouseDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const id = this.dataset.warehouseId;
+                            const name = this.dataset.warehouseName;
+                            warehouseIdInput.value = id;
+                            warehouseSearch.value = name;
+                            warehouseDropdown.style.display = 'none';
+                        });
+                    });
+                }
+
+                warehouseSearch.addEventListener('input', function() {
+                    filterWarehouses(this.value);
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!warehouseSearch.contains(e.target) && !warehouseDropdown.contains(e.target)) {
+                        warehouseDropdown.style.display = 'none';
+                    }
+                });
+
+                warehouseSearch.addEventListener('blur', function() {
+                    setTimeout(() => {
+                        if (!warehouseIdInput.value) {
+                            warehouseSearch.value = '';
+                        }
+                    }, 200);
+                });
+            }
+
+            // Add Customer Modal
+            const addCustomerBtn = document.getElementById('addCustomerBtn');
+            const addCustomerModal = new bootstrap.Modal(document.getElementById('addCustomerModal'));
+            const saveCustomerBtn = document.getElementById('saveCustomerBtn');
+            const addCustomerForm = document.getElementById('addCustomerForm');
+
+            addCustomerBtn.addEventListener('click', function() {
+                addCustomerForm.reset();
+                addCustomerModal.show();
+            });
+
+            // Save new customer
+            saveCustomerBtn.addEventListener('click', async function() {
+                const formData = new FormData(addCustomerForm);
+
+                // Validation
+                if (!formData.get('name') || !formData.get('type')) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                saveCustomerBtn.disabled = true;
+                saveCustomerBtn.innerHTML = '<i class="las la-spinner la-spin"></i> Saving...';
+
+                try {
+                    const response = await fetch('{{ route('customers.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (e) {
+                        // If response is not JSON, it might be a redirect
+                        if (response.redirected) {
+                            alert('Customer created successfully! Please refresh the page.');
+                            location.reload();
+                            return;
+                        }
+                        throw new Error('Invalid response from server');
+                    }
+
+                    if (response.ok && result.success) {
+                        // Add new customer to the list
+                        const customer = result.customer || result.data;
+                        const newCustomer = {
+                            id: customer.id,
+                            name: customer.name,
+                            contact: customer.contact || '',
+                            email: customer.email || ''
+                        };
+                        customers.push(newCustomer);
+
+                        // Select the newly created customer
+                        customerSearch.value = newCustomer.name;
+                        customerIdInput.value = newCustomer.id;
+
+                        // Close modal
+                        addCustomerModal.hide();
+                        addCustomerForm.reset();
+
+                        alert('Customer created successfully!');
+                    } else {
+                        let errorMsg = 'Error creating customer';
+                        if (result.errors) {
+                            errorMsg = Object.values(result.errors).flat().join('\n');
+                        } else if (result.message) {
+                            errorMsg = result.message;
+                        }
+                        alert(errorMsg);
+                    }
+                } catch (error) {
+                    alert('An error occurred while creating customer');
+                    console.error('Error:', error);
+                } finally {
+                    saveCustomerBtn.disabled = false;
+                    saveCustomerBtn.innerHTML = '<i class="las la-save"></i> Save Customer';
+                }
+            });
+
+            // Products data
+            const products = @json($products);
+            let productRowIndex = 0;
+
+            // Add product row
+            function addProductRow() {
+                const tbody = document.getElementById('productsTableBody');
+                const row = document.createElement('tr');
+                row.id = `productRow_${productRowIndex}`;
+
+                row.innerHTML = `
+            <td>
+                <div class="position-relative">
+                    <input type="text" class="form-control product-search" data-index="${productRowIndex}" placeholder="Search product by code or name..." autocomplete="off">
+                    <input type="hidden" class="product-id-input" name="products[${productRowIndex}][product_id]" value="">
+                    <input type="hidden" class="product-code-display" name="products[${productRowIndex}][product_code]" value="">
+                    <input type="hidden" class="product-name-display" name="products[${productRowIndex}][product_name]" value="">
+                    <div class="product-dropdown dropdown-menu position-absolute w-100" style="display: none; max-height: 200px; overflow-y: auto; top: 100%; left: 0; z-index: 1000;">
+                        <!-- Product dropdown items will be populated here -->
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input type="text" class="form-control unit-type" name="products[${productRowIndex}][unit_type]" readonly>
+            </td>
+            <td>
+                <input type="number" class="form-control qty" name="products[${productRowIndex}][qty]" value="0" min="0" step="1" data-index="${productRowIndex}">
+            </td>
+            <td>
+                <input type="number" class="form-control price" name="products[${productRowIndex}][price]" value="0" min="0" step="0.01" data-index="${productRowIndex}">
+            </td>
+            <td>
+                <input type="text" class="form-control total-amount" name="products[${productRowIndex}][total_amount]" value="0.00" readonly>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-product" data-index="${productRowIndex}">
+                    <i class="las la-times"></i>
+                </button>
+            </td>
+        `;
+
+                tbody.appendChild(row);
+
+                // Product search functionality (similar to vendor search)
+                const productSearchInput = row.querySelector('.product-search');
+                const productDropdown = row.querySelector('.product-dropdown');
+                const productIdInput = row.querySelector('.product-id-input');
+                const productCodeDisplay = row.querySelector('.product-code-display');
+                const productNameDisplay = row.querySelector('.product-name-display');
+                const unitTypeInput = row.querySelector('.unit-type');
+                let filteredProducts = products;
+
+                // Filter products based on search (by ID or name)
+                function filterProducts(query, index) {
+                    if (!query || query.trim() === '') {
+                        filteredProducts = products;
+                        productDropdown.style.display = 'none';
+                        return;
+                    }
+
+                    const searchTerm = query.toLowerCase();
+                    filteredProducts = products.filter(product =>
+                        product.id.toString().includes(searchTerm) ||
+                        product.product_name.toLowerCase().includes(searchTerm)
+                    );
+
+                    displayProductDropdown(index);
+                }
+
+                // Display product dropdown
+                function displayProductDropdown(index) {
+                    if (filteredProducts.length === 0) {
+                        productDropdown.innerHTML =
+                            '<div class="dropdown-item-text text-muted">No products found</div>';
+                    } else {
+                        productDropdown.innerHTML = filteredProducts.map(product =>
+                            `<a class="dropdown-item" href="#" data-product-id="${product.id}" data-product-code="${product.id}" data-product-name="${product.product_name}" data-unit-type="${product.unit_type || ''}">
+                                <strong>${product.id}</strong> - ${product.product_name}
+                            </a>`
+                        ).join('');
+                    }
+
+                    productDropdown.style.display = 'block';
+
+                    // Add click handlers to dropdown items
+                    productDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const productId = this.dataset.productId;
+                            const productCode = this.dataset.productCode;
+                            const productName = this.dataset.productName;
+                            const unitType = this.dataset.unitType || '';
+
+                            // Update all fields
+                            productSearchInput.value = `${productCode} - ${productName}`;
+                            productIdInput.value = productId;
+                            productCodeDisplay.value = productCode;
+                            productNameDisplay.value = productName;
+                            unitTypeInput.value = unitType;
+
+                            productDropdown.style.display = 'none';
+                            calculateRowTotal(index);
+                        });
+                    });
+                }
+
+                // Handle product search input
+                productSearchInput.addEventListener('input', function() {
+                    const index = parseInt(this.dataset.index);
+                    filterProducts(this.value, index);
+                });
+
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!productSearchInput.contains(e.target) && !productDropdown.contains(e.target)) {
+                        productDropdown.style.display = 'none';
+                    }
+                });
+
+                // Clear product selection when search is cleared
+                productSearchInput.addEventListener('blur', function() {
+                    setTimeout(() => {
+                        if (!productIdInput.value) {
+                            productSearchInput.value = '';
+                        }
+                    }, 200);
+                });
+
+                // Handle qty and price changes
+                row.querySelector('.qty').addEventListener('input', function() {
+                    calculateRowTotal(parseInt(this.dataset.index));
+                });
+
+                row.querySelector('.price').addEventListener('input', function() {
+                    calculateRowTotal(parseInt(this.dataset.index));
+                });
+
+                // Handle remove button
+                row.querySelector('.remove-product').addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    document.getElementById(`productRow_${index}`).remove();
+                    calculateTotals();
+                });
+
+                productRowIndex++;
+            }
+
+            // Calculate row total
+            function calculateRowTotal(index) {
+                const row = document.getElementById(`productRow_${index}`);
+                if (!row) return;
+
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                const totalAmount = qty * price;
+
+                row.querySelector('.total-amount').value = totalAmount.toFixed(2);
+                calculateTotals();
+            }
+
+            // Calculate totals
+            function calculateTotals() {
+                let subtotal = 0;
+                document.querySelectorAll('.total-amount').forEach(input => {
+                    subtotal += parseFloat(input.value) || 0;
+                });
+
+                const freightCharges = parseFloat(document.getElementById('freight_charges').value) || 0;
+                const grandTotal = subtotal + freightCharges;
+
+                document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+                document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+            }
+
+            // Add product button
+            document.getElementById('addProductBtn').addEventListener('click', function() {
+                addProductRow();
+            });
+
+            // Freight charges change
+            document.getElementById('freight_charges').addEventListener('input', calculateTotals);
+
+            // Form submission
+            document.getElementById('salesOrderForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Validation
+                const customerIdInput = document.getElementById('customer_id');
+                if (!customerIdInput || !customerIdInput.value) {
+                    alert('Please select a customer');
+                    return;
+                }
+
+                if (!document.getElementById('invoice_no').value.trim()) {
+                    alert('Please enter invoice number');
+                    return;
+                }
+
+                const productRows = document.querySelectorAll('#productsTableBody tr');
+                if (productRows.length === 0) {
+                    alert('Please add at least one product');
+                    return;
+                }
+
+                // Validate products
+                let isValid = true;
+                productRows.forEach((row, index) => {
+                    const productIdInput = row.querySelector('.product-id-input');
+                    const productId = productIdInput ? productIdInput.value : '';
+                    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                    const price = parseFloat(row.querySelector('.price').value) || 0;
+
+                    if (!productId) {
+                        alert(`Please select a product for row ${index + 1}`);
+                        isValid = false;
+                        return;
+                    }
+                    if (qty <= 0 || qty % 1 !== 0) {
+                        alert(`Please enter valid integer quantity for row ${index + 1}`);
+                        isValid = false;
+                        return;
+                    }
+                    if (price <= 0) {
+                        alert(`Please enter valid price for row ${index + 1}`);
+                        isValid = false;
+                        return;
+                    }
+                });
+
+                if (!isValid) return;
+
+                // Prepare form data
+                const formData = new FormData(this);
+                const data = {};
+
+                // Convert FormData to object
+                for (let [key, value] of formData.entries()) {
+                    if (key.startsWith('products[')) {
+                        const match = key.match(/products\[(\d+)\]\[(\w+)\]/);
+                        if (match) {
+                            const index = match[1];
+                            const field = match[2];
+                            if (!data.products) data.products = [];
+                            if (!data.products[index]) data.products[index] = {};
+                            data.products[index][field] = value;
+                        }
+                    } else {
+                        data[key] = value;
+                    }
+                }
+
+                // Convert products array
+                if (data.products) {
+                    data.products = Object.values(data.products);
+                }
+
+                // Submit
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="las la-spinner la-spin"></i> Saving...';
+
+                try {
+                    const response = await fetch('{{ route('sales-orders.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Store sale ID for printing
+                        const saleId = result.data?.id || result.data?.sale_id || result.data
+                            ?.data?.id;
+                        if (saleId) {
+                            window.saleId = saleId;
+                        } else {
+                            // Try to extract from nested data
+                            const data = result.data?.data || result.data;
+                            if (data && data.id) {
+                                window.saleId = data.id;
+                            }
+                        }
+
+                        // Show success modal
+                        const successModal = new bootstrap.Modal(document.getElementById(
+                            'successModal'));
+                        successModal.show();
+
+                        // Reset form
+                        document.getElementById('salesOrderForm').reset();
+                        document.getElementById('productsTableBody').innerHTML = '';
+                        productRowIndex = 0;
+                        addProductRow();
+
+                        // Reset save button
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="las la-save"></i> Save Only';
+                    } else {
+                        alert(result.message || 'Error creating sales order');
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="las la-save"></i> Save';
+                    }
+                } catch (error) {
+                    alert('An error occurred while creating sales order');
+                    console.error('Error:', error);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="las la-save"></i> Save';
+                }
+            });
+
+            // Print invoice button (from form)
+            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
+                if (window.saleId) {
+                    window.open(`{{ url('sales-orders') }}/${window.saleId}/print`, '_blank');
+                } else {
+                    alert('Please save the sales order first');
+                }
+            });
+
+            // Print invoice button (from success modal)
+            document.getElementById('printInvoiceModalBtn').addEventListener('click', function() {
+                if (window.saleId) {
+                    window.open(`{{ url('sales-orders') }}/${window.saleId}/print`, '_blank');
+                }
+            });
+
+            // Add initial product row
+            addProductRow();
+        });
+    </script>
+@endpush
+

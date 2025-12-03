@@ -110,10 +110,12 @@
                                     <a class="nav-link" href="{{ route('employees.index') }}">View</a>
                                 </li><!--end nav-item-->
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('employees.attendances.index') }}">Attendance</a>
+                                    <a class="nav-link"
+                                        href="{{ route('employees.attendances.index') }}">Attendance</a>
                                 </li><!--end nav-item-->
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('employees.advance-salaries.index') }}">Advance Salaries</a>
+                                    <a class="nav-link"
+                                        href="{{ route('employees.advance-salaries.index') }}">Advance Salaries</a>
                                 </li><!--end nav-item-->
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('employees.overtimes.index') }}">Overtime</a>
@@ -137,12 +139,12 @@
                             <span>Product Categories</span>
                         </a>
                     </li><!--end nav-item-->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('product-types.index') }}">
-                                <i class="iconoir-cube menu-icon"></i>
-                                <span>Product Types</span>
-                            </a>
-                        </li><!--end nav-item-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('product-types.index') }}">
+                            <i class="iconoir-cube menu-icon"></i>
+                            <span>Product Types</span>
+                        </a>
+                    </li><!--end nav-item-->
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarProducts">
@@ -192,15 +194,16 @@
                         <span>Purchase Orders</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#sidebarPurchaseOrdersNonTax" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarPurchaseOrdersNonTax">
+                        <a class="nav-link" href="#sidebarPurchaseOrdersNonTax" data-bs-toggle="collapse"
+                            role="button" aria-expanded="false" aria-controls="sidebarPurchaseOrdersNonTax">
                             <i class="las la-receipt menu-icon text-primary"></i>
                             <span>Purchase Invoice (Non-Tax)</span>
                         </a>
                         <div class="collapse " id="sidebarPurchaseOrdersNonTax">
                             <ul class="nav flex-column">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('purchase-orders.non-tax.create') }}">Create</a>
+                                    <a class="nav-link"
+                                        href="{{ route('purchase-orders.non-tax.create') }}">Create</a>
                                 </li><!--end nav-item-->
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('purchase-orders.non-tax.index') }}">View</a>
@@ -209,8 +212,8 @@
                         </div><!--end startbarPurchaseOrdersNonTax-->
                     </li><!--end nav-item-->
                     <li class="nav-item">
-                        <a class="nav-link" href="#sidebarPurchaseOrdersTax" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarPurchaseOrdersTax">
+                        <a class="nav-link" href="#sidebarPurchaseOrdersTax" data-bs-toggle="collapse"
+                            role="button" aria-expanded="false" aria-controls="sidebarPurchaseOrdersTax">
                             <i class="las la-file-invoice-dollar menu-icon text-success"></i>
                             <span>Purchase Invoice (Tax)</span>
                         </a>
@@ -225,10 +228,49 @@
                             </ul><!--end nav-->
                         </div><!--end startbarPurchaseOrdersTax-->
                     </li><!--end nav-item-->
-                 
+                    <br>
+                    <li class="menu-label pt-0 mt-0">
+                            <span>Sales Orders</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sidebarSalesOrdersNonTax" data-bs-toggle="collapse"
+                            role="button" aria-expanded="false" aria-controls="sidebarSalesOrdersNonTax">
+                            <i class="las la-receipt menu-icon text-primary"></i>
+                            <span>Sales Invoice (Non-Tax)</span>
+                        </a>
+                        <div class="collapse " id="sidebarSalesOrdersNonTax">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                        href="{{ route('sales-orders.non-tax.create') }}">Create</a>
+                                </li><!--end nav-item-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('sales-orders.non-tax.index') }}">View</a>
+                                </li><!--end nav-item-->
+                            </ul><!--end nav-->
+                        </div><!--end startbarSalesOrdersNonTax-->
+                    </li><!--end nav-item-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sidebarSalesOrdersTax" data-bs-toggle="collapse"
+                            role="button" aria-expanded="false" aria-controls="sidebarPurchaseOrdersTax">
+                            <i class="las la-file-invoice-dollar menu-icon text-success"></i>
+                            <span>Sales Invoice (Tax)</span>
+                        </a>
+                        <div class="collapse " id="sidebarSalesOrdersTax">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('sales-orders.tax.create') }}">Create</a>
+                                </li><!--end nav-item-->    
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('sales-orders.tax.index') }}">View</a>
+                                </li><!--end nav-item-->
+                            </ul><!--end nav-->
+                        </div><!--end startbarSalesOrdersTax-->
+                    </li><!--end nav-item-->
+
                 </ul><!--end navbar-nav--->
-               
+
             </div>
-        </div>  
+        </div>
     </div>
 </div>

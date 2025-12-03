@@ -19,6 +19,7 @@ use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\EmployeeReportController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SalesOrderController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -132,5 +133,23 @@ Route::middleware(['auth'])->group(function () {
         Route::get('product/unit-type', [PurchaseOrderController::class, 'getProductUnitType'])->name('purchase-orders.product.unit-type');
         Route::get('{id}/print', [PurchaseOrderController::class, 'print'])->name('purchase-orders.print');
         Route::get('{id}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    });
+    
+    // Sales Order Routes
+    Route::prefix('sales-orders')->group(function () {
+        // Non-Tax Sales Orders
+        Route::get('non-tax', [SalesOrderController::class, 'indexNonTax'])->name('sales-orders.non-tax.index');
+        Route::get('non-tax/create', [SalesOrderController::class, 'createNonTax'])->name('sales-orders.non-tax.create');
+        
+        // Tax Sales Orders
+        Route::get('tax', [SalesOrderController::class, 'indexTax'])->name('sales-orders.tax.index');
+        Route::get('tax/create', [SalesOrderController::class, 'createTax'])->name('sales-orders.tax.create');
+        
+        // Common routes
+        Route::post('store', [SalesOrderController::class, 'store'])->name('sales-orders.store');
+        Route::get('product/unit-type', [SalesOrderController::class, 'getProductUnitType'])->name('sales-orders.product.unit-type');
+        Route::get('customer/ledger', [SalesOrderController::class, 'getCustomerLedger'])->name('sales-orders.customer.ledger');
+        Route::get('{id}/print', [SalesOrderController::class, 'print'])->name('sales-orders.print');
+        Route::get('{id}', [SalesOrderController::class, 'show'])->name('sales-orders.show');
     });
 });

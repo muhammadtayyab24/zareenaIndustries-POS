@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Invoice - {{ $purchase->vendor_invoice_no }}</title>
+    <title>Sales Invoice - {{ $sale->invoice_no }}</title>
     <style>
         @media print {
             .no-print {
@@ -83,7 +83,7 @@
             flex: 1;
         }
 
-        .vendor-info {
+        .customer-info {
             margin: 20px 0;
             padding: 10px;
         }
@@ -95,17 +95,17 @@
             padding-bottom: 5px;
         }
 
-        .vendor-details {
+        .customer-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        .vendor-detail-item {
+        .customer-detail-item {
             margin-bottom: 5px;
         }
 
-        .vendor-detail-label {
+        .customer-detail-label {
             font-weight: bold;
             display: inline-block;
             width: 100px;
@@ -256,7 +256,7 @@
             <div class="company-info">
                 <p>D-27 Manghopir Road, S.I.T.E. Karachi.</p>
                 <p>Tel: 92-021-32588033 | E-Mail: info@zareenaindustries.com</p>
-                @if ($purchase->type === 'tax')
+                @if ($sale->type === 'tax')
                     <p>N.T.N.: 3238408-4 | S.T.R.N: 17-00-3238-408-14</p>
                 @endif
             </div>
@@ -270,10 +270,10 @@
                         <tr>
                             <td colspan="2"
                                 style="text-align:center; font-size:13px; font-weight:bold; padding:5px 0 2px 0; letter-spacing:1px;">
-                                @if ($purchase->type === 'tax')
-                                    PURCHASE INVOICE (SALES TAX)
+                                @if ($sale->type === 'tax')
+                                    SALES INVOICE (SALES TAX)
                                 @else
-                                    PURCHASE INVOICE
+                                    SALES INVOICE
                                 @endif
                             </td>
                         </tr>
@@ -287,29 +287,29 @@
                         </tr>
                         <tr>
                             <td style="width:40%; text-align:center; font-size:12px; font-weight:bold;">
-                                {{ $purchase->id }}
+                                {{ $sale->id }}
                             </td>
                             <td style="width:40%; text-align:center; font-size:12px; font-weight:bold;">
-                                @if ($purchase->type === 'tax' && $purchase->due_date)
-                                    {{ $purchase->due_date->format('d-m-Y') }}
+                                @if ($sale->type === 'tax' && $sale->due_date)
+                                    {{ $sale->due_date->format('d-m-Y') }}
                                 @else
-                                    {{ $purchase->created_at->format('d-m-Y') }}
+                                    {{ $sale->created_at->format('d-m-Y') }}
                                 @endif
                             </td>
                         </tr>
                     </table>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Vendor Invoice No:</span>
-                    <span class="detail-value">{{ $purchase->vendor_invoice_no }}</span>
+                    <span class="detail-label">Invoice No:</span>
+                    <span class="detail-value">{{ $sale->invoice_no }}</span>
                 </div>
-                @if ($purchase->type === 'tax')
+                @if ($sale->type === 'tax')
                     <div class="detail-row">
-                        <span class="detail-label">Purchase Order No:</span>
+                        <span class="detail-label">PO No:</span>
                         <span class="detail-value"> _______________________ </span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Purchase Order Date:</span>
+                        <span class="detail-label">PO Date:</span>
                         <span class="detail-value"> _______________________ </span>
                     </div>
                     <div class="detail-row">
@@ -327,41 +327,41 @@
                 @else
                     <div class="detail-row">
                         <span class="detail-label">PO Number:</span>
-                        <span class="detail-value">{{ $purchase->po_no ?? ' _______________________ ' }}</span>
+                        <span class="detail-value">{{ $sale->po_no ?? ' _______________________ ' }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">GRN Number:</span>
-                        <span class="detail-value">{{ $purchase->grn_no ?? ' _______________________ ' }}</span>
+                        <span class="detail-value">{{ $sale->dc_no ?? ' _______________________ ' }}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Vendor Invoice Date:</span>
+                        <span class="detail-label">Invoice Date:</span>
                         <span
-                            class="detail-value">{{ $purchase->due_date ? $purchase->due_date->format('d-m-Y') : $purchase->created_at->format('d-m-Y') ?? ' _______________________ ' }}</span>
+                            class="detail-value">{{ $sale->due_date ? $sale->due_date->format('d-m-Y') : $sale->created_at->format('d-m-Y') ?? ' _______________________ ' }}</span>
                     </div>
                 @endif
             </div>
             <div class="invoice-details-right">
-                <h3>Vendor Details</h3>
+                <h3>Customer Details</h3>
                 <div class="detail-row">
                     <span class="vendor-detail-label">Code:</span>
-                    <span>{{ $purchase->vendor->id ?? 'N/A' }}</span>
+                    <span>{{ $sale->customer->id ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="vendor-detail-label">Name:</span>
-                    <span>{{ $purchase->vendor->name ?? 'N/A' }}</span>
+                    <span>{{ $sale->customer->name ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="vendor-detail-label">Address:</span>
-                    <span>{{ $purchase->vendor->address ?? 'N/A' }}</span>
+                    <span>{{ $sale->customer->address ?? 'N/A' }}</span>
                 </div>
-                @if ($purchase->type === 'tax')
+                @if ($sale->type === 'tax')
                     <div class="detail-row">
                         <span class="vendor-detail-label">Phone:</span>
-                        <span>{{ $purchase->vendor->contact ?? '' }}</span>
+                        <span>{{ $sale->customer->contact ?? '' }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="vendor-detail-label">N.T.N.:</span>
-                        <span>{{ $purchase->vendor->ntn ?? '' }}</span>
+                        <span>{{ $sale->customer->ntn ?? '' }}</span>
                     </div>
                     {{--  <div class="detail-row">
                         <span class="vendor-detail-label">C.N.I.C. No.:</span>
@@ -369,41 +369,41 @@
                     </div>  --}}
                     <div class="detail-row">
                         <span class="vendor-detail-label">S.T.R.N.:</span>
-                        <span>{{ $purchase->vendor->strn ?? '' }}</span>
+                        <span>{{ $sale->customer->strn ?? '' }}</span>
                     </div>
                 @else
                     <div class="detail-row">
                         <span class="vendor-detail-label">Phone:</span>
-                        <span>{{ $purchase->vendor->contact ?? '' }}</span>
+                        <span>{{ $sale->customer->contact ?? '' }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="vendor-detail-label">N.T.N.:</span>
-                        <span>{{ $purchase->vendor->ntn ?? '' }}</span>
+                        <span>{{ $sale->customer->ntn ?? '' }}</span>
                     </div>
-                    <div class="detail-row">
+                    {{--  <div class="detail-row">
                         <span class="vendor-detail-label">C.N.I.C. No.:</span>
                         <span></span>
-                    </div>
+                    </div>  --}}
                     <div class="detail-row">
                         <span class="vendor-detail-label">S.T.R.N.:</span>
-                        <span>{{ $purchase->vendor->strn ?? '' }}</span>
+                        <span>{{ $sale->customer->strn ?? '' }}</span>
                     </div>
                 @endif
 
 
                 {{--  <div class="detail-row">
                     <span class="detail-label">Purchase invoice No:</span>
-                    <span class="detail-value">{{ $purchase->po_no ?? 'N/A' }}</span>
+                    <span class="detail-value">{{ $sale->po_no ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Purchase invoice Date:</span>
                     <span
-                        class="detail-value">{{ $purchase->po_no ? $purchase->created_at->format('d-m-Y') : 'N/A' }}</span>
+                        class="detail-value">{{ $sale->po_no ? $sale->created_at->format('d-m-Y') : 'N/A' }}</span>
                 </div>  --}}
-                {{--  @if ($purchase->credit_term)
+                {{--  @if ($sale->credit_term)
                 <div class="detail-row">
                     <span class="detail-label">Credit Term:</span>
-                    <span class="detail-value">{{ $purchase->credit_term }}</span>
+                    <span class="detail-value">{{ $sale->credit_term }}</span>
                 </div>
                 @endif  --}}
             </div>
@@ -415,11 +415,11 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">S.No.</th>
-                    <th style="width: @if ($purchase->type === 'tax') 25% @else 40% @endif;">Description</th>
+                    <th style="width: @if ($sale->type === 'tax') 25% @else 40% @endif;">Description</th>
                     <th style="width: 8%;">Quantity</th>
                     <th style="width: 8%;">Unit</th>
                     <th style="width: 10%;">Rate</th>
-                    @if ($purchase->type === 'tax')
+                    @if ($sale->type === 'tax')
                         <th style="width: 12%;">Amt. Exc. Sales Tax</th>
                         <th colspan="2" style="width: 10%;">Sales Tax Rate/Amount</th>
                         <th style="width: 10%;">Amt. Inc. Sales Tax</th>
@@ -429,21 +429,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($purchase->products as $index => $purchaseProduct)
+                @foreach ($sale->products as $index => $saleProduct)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
-                        <td>{{ $purchaseProduct->product->product_name ?? 'N/A' }}</td>
-                        <td class="text-center">{{ number_format($purchaseProduct->qty, 2) }}</td>
-                        <td class="text-center">{{ $purchaseProduct->unit_type ?? 'N/A' }}</td>
-                        <td>{{ number_format($purchaseProduct->price, 2) }}</td>
-                        @if ($purchase->type === 'tax')
-                            <td>{{ number_format($purchaseProduct->net_amount ?? $purchaseProduct->qty * $purchaseProduct->price, 2) }}
+                        <td>{{ $saleProduct->product->product_name ?? 'N/A' }}</td>
+                        <td class="text-center">{{ number_format($saleProduct->qty, 2) }}</td>
+                        <td class="text-center">{{ $saleProduct->unit_type ?? 'N/A' }}</td>
+                        <td>{{ number_format($saleProduct->price, 2) }}</td>
+                        @if ($sale->type === 'tax')
+                            <td>{{ number_format($saleProduct->net_amount ?? $saleProduct->qty * $saleProduct->price, 2) }}
                             </td>
-                            <td class="text-center">{{ number_format($purchaseProduct->gst_percentage ?? 0, 2) }}%</td>
-                            <td>{{ number_format($purchaseProduct->gst_amount ?? 0, 2) }}</td>
-                            <td>{{ number_format($purchaseProduct->total_amount, 2) }}</td>
+                            <td class="text-center">{{ number_format($saleProduct->gst_percentage ?? 0, 2) }}%</td>
+                            <td>{{ number_format($saleProduct->gst_amount ?? 0, 2) }}</td>
+                            <td>{{ number_format($saleProduct->total_amount, 2) }}</td>
                         @else
-                            <td>{{ number_format($purchaseProduct->total_amount, 2) }}</td>
+                            <td>{{ number_format($saleProduct->total_amount, 2) }}</td>
                         @endif
                     </tr>
                 @endforeach
@@ -452,19 +452,19 @@
             <tfoot>
                 <tr>
                     <td colspan="2" class="text-right"><strong>Total:</strong></td>
-                    <td class="text-center"><strong>{{ number_format($purchase->products->sum('qty'), 2) }}</strong>
+                    <td class="text-center"><strong>{{ number_format($sale->products->sum('qty'), 2) }}</strong>
                     </td>
                     <td class="text-center">-</td>
                     <td class="text-center">-</td>
-                    @if ($purchase->type === 'tax')
-                        <td class="text-right"><strong>{{ number_format($purchase->subtotal, 2) }}</strong></td>
+                    @if ($sale->type === 'tax')
+                        <td class="text-right"><strong>{{ number_format($sale->subtotal, 2) }}</strong></td>
                         {{--  <td class="text-center">-</td>  --}}
-                        <td colspan="2" class="text-center"><strong>{{ number_format($purchase->total_gst, 2) }}</strong></td>
+                        <td colspan="2" class="text-center"><strong>{{ number_format($sale->total_gst, 2) }}</strong></td>
                         <td class="text-right">
-                            <strong>{{ number_format($purchase->products->sum('total_amount'), 2) }}</strong></td>
+                            <strong>{{ number_format($sale->products->sum('total_amount'), 2) }}</strong></td>
                     @else
                         <td class="text-right">
-                            <strong>{{ number_format($purchase->products->sum('total_amount'), 2) }}</strong></td>
+                            <strong>{{ number_format($sale->products->sum('total_amount'), 2) }}</strong></td>
                     @endif
                 </tr>
             </tfoot>
@@ -476,33 +476,33 @@
             </div>
             <div class="summary-right">
                 <table class="summary-table">
-                    @if ($purchase->type === 'tax')
+                    @if ($sale->type === 'tax')
                         <tr>
                             <td>Adv. Inc. Tax:</td>
-                            <td>{{ number_format($purchase->adv_inc_tax_percentage ?? 0, 2) }}% Rs.
-                                {{ number_format($purchase->adv_inc_tax_amount ?? 0, 2) }}</td>
+                            <td>{{ number_format($sale->adv_inc_tax_percentage ?? 0, 2) }}% Rs.
+                                {{ number_format($sale->adv_inc_tax_amount ?? 0, 2) }}</td>
                         </tr>
                         {{--  <tr>
                             <td>Carriage and Freight:</td>
-                            <td>Rs. {{ number_format($purchase->freight_charges, 2) }}</td>
+                            <td>Rs. {{ number_format($sale->freight_charges, 2) }}</td>
                         </tr>  --}}
                     @else
                         <tr>
                             <td>Totals (Amount):</td>
-                            <td>{{ number_format($purchase->subtotal, 2) }}</td>
+                            <td>{{ number_format($sale->subtotal, 2) }}</td>
                         </tr>
                         <tr>
                             <td>Carriage and Freight:</td>
-                            <td>{{ number_format($purchase->freight_charges, 2) }}</td>
+                            <td>{{ number_format($sale->freight_charges, 2) }}</td>
                         </tr>
                         <tr>
                             <td>Labour Charges:</td>
-                            <td>{{ number_format($purchase->labour_charges, 2) }}</td>
+                            <td>{{ number_format($sale->labour_charges, 2) }}</td>
                         </tr>
                     @endif
                     <tr class="total-row">
                         <td>Net Total:</td>
-                        <td>Rs. {{ number_format($purchase->grand_total, 2) }}</td>
+                        <td>Rs. {{ number_format($sale->grand_total, 2) }}</td>
                     </tr>
                 </table>
                 <div class="amount-in-words">
@@ -598,7 +598,7 @@
                             return $result;
                         }
                     @endphp
-                    Rupees {{ ucwords(numberToWords($purchase->grand_total)) }} Only
+                    Rupees {{ ucwords(numberToWords($sale->grand_total)) }} Only
                 </div>
             </div>
         </div>
