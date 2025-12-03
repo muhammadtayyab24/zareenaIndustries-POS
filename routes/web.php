@@ -115,6 +115,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('expense-vouchers', ExpenseVoucherController::class);
     
     // Warehouse Management Routes
+    // Inventory routes must be defined BEFORE resource routes to avoid route conflicts
+    Route::get('/warehouses/inventory', [WarehouseController::class, 'inventory'])->name('warehouses.inventory');
+    Route::get('/warehouses/inventory/{warehouseId}', [WarehouseController::class, 'getInventory'])->name('warehouses.inventory.show');
     Route::resource('warehouses', WarehouseController::class);
     Route::post('/warehouses/{warehouse}/toggle-status', [WarehouseController::class, 'toggleStatus'])->name('warehouses.toggle-status');
     

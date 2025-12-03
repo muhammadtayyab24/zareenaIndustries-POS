@@ -92,6 +92,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('warehouses.index') }}">View</a>
                                 </li><!--end nav-item-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('warehouses.inventory') }}">Inventory</a>
+                                </li><!--end nav-item-->
                             </ul><!--end nav-->
                         </div><!--end startbarWarehouses-->
                     </li><!--end nav-item-->

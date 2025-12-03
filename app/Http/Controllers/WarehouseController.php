@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
+use App\Models\WarehouseStock;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -142,6 +144,96 @@ class WarehouseController extends Controller
             'message' => 'Warehouse status updated successfully.',
             'status' => $warehouse->status
         ]);
+    }
+
+    /**
+     * Display warehouse inventory management page.
+     */
+    public function inventory()
+    {
+        $warehouses = Warehouse::where('is_deleted', false)
+            ->where('status', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+        
+        return view('pages.warehouses.inventory', compact('warehouses'));
+    }
+
+    /**
+     * Get inventory data for a specific warehouse.
+     */
+    public function getInventory(Request $request, $warehouseId = null)
+    {
+        $warehouseId = $warehouseId ?? $request->warehouse_id;
+        
+        if (!$warehouseId) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Warehouse ID is required.'
+                ], 400);
+            }
+            return redirect()->route('warehouses.inventory')->with('error', 'Warehouse ID is required.');
+        }
+
+        $warehouse = Warehouse::where('id', $warehouseId)
+            ->where('is_deleted', false)
+            ->first();
+
+        if (!$warehouse) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Warehouse not found.'
+                ], 404);
+            }
+            return redirect()->route('warehouses.inventory')->with('error', 'Warehouse not found.');
+        }
+
+        // Get all products with their stock in this warehouse
+        $products = Product::where('is_deleted', false)
+            ->where('status', 1)
+            ->with(['category', 'type'])
+            ->with(['warehouseStocks' => function($query) use ($warehouseId) {
+                $query->where('warehouse_id', $warehouseId);
+            }])
+            ->orderBy('product_name', 'asc')
+            ->get()
+            ->map(function($product) use ($warehouseId) {
+                $stock = $product->warehouseStocks->first();
+                return [
+                    'id' => $product->id,
+                    'product_name' => $product->product_name,
+                    'category' => $product->category->name ?? 'N/A',
+                    'type' => $product->type->name ?? 'N/A',
+                    'unit_type' => $product->unit_type ?? 'N/A',
+                    'stock_qty' => $stock ? number_format($stock->qty, 2) : '0.00',
+                    'stock_qty_raw' => $stock ? (float)$stock->qty : 0,
+                ];
+            });
+
+        // Check if request is AJAX or expects JSON
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'success' => true,
+                'warehouse' => [
+                    'id' => $warehouse->id,
+                    'name' => $warehouse->name,
+                    'code' => $warehouse->code,
+                    'address' => $warehouse->address,
+                ],
+                'products' => $products->values(),
+                'total_products' => $products->count(),
+                'total_stock_value' => $products->sum('stock_qty_raw'),
+            ]);
+        }
+
+        $warehouses = Warehouse::where('is_deleted', false)
+            ->where('status', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('pages.warehouses.inventory', compact('warehouses', 'warehouse', 'products'));
     }
 }
 
