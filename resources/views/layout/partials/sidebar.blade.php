@@ -24,9 +24,28 @@
             <div class="d-flex align-items-start flex-column w-100">
                 <!-- Navigation -->
                 <ul class="navbar-nav mb-auto w-100">
-                    <li class="menu-label pt-0 mt-0">
-                        <span>User Management</span>
-                    </li>
+                    @if(auth()->user()->isSuperAdmin())
+                        <!-- Super Admin Menu -->
+                        <li class="menu-label pt-0 mt-0">
+                            <span>Company Management</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('companies.create') }}">
+                                <i class="fas fa-building menu-icon"></i>
+                                <span>Create Company</span>
+                            </a>
+                        </li><!--end nav-item-->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('companies.create-admin') }}">
+                                <i class="fas fa-user-shield menu-icon"></i>
+                                <span>Create Company Admin</span>
+                            </a>
+                        </li><!--end nav-item-->
+                    @else
+                        <!-- Regular Menu for Company Users -->
+                        <li class="menu-label pt-0 mt-0">
+                            <span>User Management</span>
+                        </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarUsers">
@@ -270,6 +289,7 @@
                             </ul><!--end nav-->
                         </div><!--end startbarSalesOrdersTax-->
                     </li><!--end nav-item-->
+                    @endif
 
                 </ul><!--end navbar-nav--->
 

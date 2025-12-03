@@ -97,8 +97,9 @@
                                 <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                                 <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                     <option value="">Select Role</option>
-                                    <option value="1" {{ old('role', $user->role) == 1 ? 'selected' : '' }}>Admin</option>
-                                    <option value="2" {{ old('role', $user->role) == 2 ? 'selected' : '' }}>Manager</option>
+                                    <option value="1" {{ old('role', $user->role) == 1 ? 'selected' : '' }}>Company Admin</option>
+                                    <option value="2" {{ old('role', $user->role) == 2 ? 'selected' : '' }}>Company Manager</option>
+                                    <option value="3" {{ old('role', $user->role) == 3 ? 'selected' : '' }}>Company User</option>
                                 </select>
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>

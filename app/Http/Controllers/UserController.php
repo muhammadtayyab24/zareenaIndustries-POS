@@ -15,12 +15,23 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Only admin can access
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can access (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
             abort(403, 'Unauthorized access');
         }
 
-        $users = User::where('is_deleted', false)->orderBy('created_at', 'desc')->get();
+        // Get users of the same company
+        $users = User::where('company_id', $currentUser->company_id)
+            ->where('is_deleted', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
         return view('pages.users.index', compact('users'));
     }
 
@@ -29,8 +40,14 @@ class UserController extends Controller
      */
     public function create()
     {
-        // Only admin can create users
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can create users (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
             abort(403, 'Unauthorized access');
         }
 
@@ -42,18 +59,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Only admin can create users
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can create users (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
             abort(403, 'Unauthorized access');
         }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->where(function ($query) use ($currentUser) {
+                return $query->where('company_id', $currentUser->company_id)
+                    ->where('is_deleted', false);
             })],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'integer', 'in:1,2'], // 1 = admin, 2 = manager
+            'role' => ['required', 'integer', 'in:1,2,3'], // 1 = company admin, 2 = company manager, 3 = company user
             'status' => ['sometimes', 'integer', 'in:0,1'], // 0 = inactive, 1 = active
         ]);
 
@@ -62,6 +86,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
+            'company_id' => $currentUser->company_id, // Same company as creator
             'status' => $validated['status'] ?? 1, // Default to active if not provided
             'is_deleted' => false,
         ]);
@@ -74,8 +99,19 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        // Only admin can edit users
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can edit users (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Don't allow editing users from different company
+        if ($user->company_id !== $currentUser->company_id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -92,8 +128,19 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Only admin can update users
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can update users (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Don't allow updating users from different company
+        if ($user->company_id !== $currentUser->company_id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -104,11 +151,12 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)->where(function ($query) use ($currentUser) {
+                return $query->where('company_id', $currentUser->company_id)
+                    ->where('is_deleted', false);
             })],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'integer', 'in:1,2'], // 1 = admin, 2 = manager
+            'role' => ['required', 'integer', 'in:1,2,3'], // 1 = company admin, 2 = company manager, 3 = company user
             'status' => ['required', 'integer', 'in:0,1'], // 0 = inactive, 1 = active
         ]);
 
@@ -131,8 +179,19 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Only admin can delete users
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can delete users (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            abort(403, 'Super Admin cannot access this page.');
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Don't allow deleting users from different company
+        if ($user->company_id !== $currentUser->company_id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -154,8 +213,25 @@ class UserController extends Controller
      */
     public function toggleStatus(Request $request, User $user)
     {
-        // Only admin can toggle status
-        if (Auth::user()->role != 1) {
+        $currentUser = Auth::user();
+        
+        // Only company admin can toggle status (not super admin)
+        if ($currentUser->isSuperAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Super Admin cannot access this page.'
+            ], 403);
+        }
+        
+        if (!$currentUser->isCompanyAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
+        // Don't allow toggling users from different company
+        if ($user->company_id !== $currentUser->company_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'

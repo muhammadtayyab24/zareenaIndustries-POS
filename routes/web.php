@@ -20,6 +20,7 @@ use App\Http\Controllers\EmployeeReportController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\CompanyController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -29,6 +30,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Protected Routes (require authentication)
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Company Management Routes (Super Admin only)
+    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+    Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
+    Route::get('/companies/create-admin', [CompanyController::class, 'createAdmin'])->name('companies.create-admin');
+    Route::post('/companies/store-admin', [CompanyController::class, 'storeAdmin'])->name('companies.store-admin');
     
     // User Management Routes (Admin only - checked in controller)
     Route::resource('users', UserController::class);

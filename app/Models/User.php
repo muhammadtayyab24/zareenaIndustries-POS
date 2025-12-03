@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'company_id',
         'status',
         'is_deleted',
     ];
@@ -46,5 +47,59 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the company that owns the user
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Check if user is super admin
+     */
+    public function isSuperAdmin()
+    {
+        return $this->role == 0 && $this->company_id === null;
+    }
+
+    /**
+     * Check if user is company admin
+     */
+    public function isCompanyAdmin()
+    {
+        return $this->role == 1 && $this->company_id !== null;
+    }
+
+    /**
+     * Check if user is company manager
+     */
+    public function isCompanyManager()
+    {
+        return $this->role == 2 && $this->company_id !== null;
+    }
+
+    /**
+     * Check if user is company user
+     */
+    public function isCompanyUser()
+    {
+        return $this->role == 3 && $this->company_id !== null;
+    }
+
+    /**
+     * Get role name
+     */
+    public function getRoleName()
+    {
+        return match($this->role) {
+            0 => 'Super Admin',
+            1 => 'Company Admin',
+            2 => 'Company Manager',
+            3 => 'Company User',
+            default => 'Unknown'
+        };
     }
 }
