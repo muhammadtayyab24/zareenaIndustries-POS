@@ -15,13 +15,14 @@ class DatabaseSeeder extends Seeder
     {
         // Call seeders in order (respecting dependencies)
         $this->call([
-            UserSeeder::class,
+            CompanySeeder::class,        // Must be first - creates Zareena Industries
+            SuperAdminSeeder::class,      // Create Super Admin (no company_id)
+            UserSeeder::class,            // Create Company Admin and Manager (with company_id)
             ProductCategorySeeder::class,
             ProductTypeSeeder::class,
             ProductSeeder::class,
             VendorSeeder::class,
             WarehouseSeeder::class,
-            SuperAdminSeeder::class,
         ]);
     }
 }

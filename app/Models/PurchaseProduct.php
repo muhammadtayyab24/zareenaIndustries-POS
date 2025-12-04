@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\CompanyScope;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseProduct extends Model
@@ -16,6 +17,7 @@ class PurchaseProduct extends Model
         'net_amount',
         'gst_amount',
         'total_amount',
+        'company_id',
     ];
 
     protected $casts = [
@@ -26,6 +28,16 @@ class PurchaseProduct extends Model
         'gst_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function purchase()
     {

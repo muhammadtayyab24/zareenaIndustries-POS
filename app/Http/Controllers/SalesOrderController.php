@@ -212,6 +212,9 @@ class SalesOrderController extends Controller
             // Auto-generate invoice number if not provided
             $invoiceNo = $data['invoice_no'] ?? $this->getNextInvoiceNumber();
             
+            $user = Auth::user();
+            $companyId = $user->company_id;
+
             // Create sale
             $sale = Sales::create([
                 'type' => $type,
@@ -230,6 +233,7 @@ class SalesOrderController extends Controller
                 'subtotal' => $subtotal,
                 'total_gst' => $totalGst,
                 'grand_total' => $grandTotal,
+                'company_id' => $companyId,
             ]);
             
             // Create sales products and reduce warehouse stock
@@ -266,6 +270,7 @@ class SalesOrderController extends Controller
                     'net_amount' => $netAmount,
                     'gst_amount' => $gstAmount,
                     'total_amount' => $totalAmount,
+                    'company_id' => $companyId,
                 ]);
                 
                 // Reduce product current_qty (Stock Management)
@@ -278,8 +283,9 @@ class SalesOrderController extends Controller
                         [
                             'warehouse_id' => $sale->warehouse_id,
                             'product_id' => $productData['product_id'],
+                            'company_id' => $companyId,
                         ],
-                        ['qty' => 0]
+                        ['qty' => 0, 'company_id' => $companyId]
                     );
                     
                     if ($warehouseStock->qty < $qty) {
@@ -333,7 +339,12 @@ class SalesOrderController extends Controller
      */
     public function show($id)
     {
-        $sale = Sales::with(['customer', 'warehouse', 'orderTaker', 'salesman', 'products.product'])->findOrFail($id);
+        $sale = Sales::with(['customer', 'warehouse', 'orderTaker', 'salesman', 'products.product', 'company'])->findOrFail($id);
+        
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $sale->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
         
         if ($sale->type === 'tax') {
             return view('pages.sales-orders.tax.show', compact('sale'));
@@ -347,8 +358,14 @@ class SalesOrderController extends Controller
      */
     public function print($id)
     {
-        $sale = Sales::with(['customer', 'warehouse', 'orderTaker', 'salesman', 'products.product'])->findOrFail($id);
-        $printedBy = Auth::user();
+        $sale = Sales::with(['customer', 'warehouse', 'orderTaker', 'salesman', 'products.product', 'company'])->findOrFail($id);
+        $user = Auth::user();
+        
+        if (!$user->isSuperAdmin() && $sale->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+        
+        $printedBy = $user;
         
         return view('pages.sales-orders.print', compact('sale', 'printedBy'));
     }

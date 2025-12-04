@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ProductType;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class ProductTypeSeeder extends Seeder
@@ -12,6 +13,14 @@ class ProductTypeSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get Zareena Industries company
+        $company = Company::where('name', 'Zareena Industries')->first();
+        
+        if (!$company) {
+            $this->command->error('Company not found. Please run CompanySeeder first.');
+            return;
+        }
+
         $types = [
             ['name' => 'Raw Material', 'status' => 1],
             ['name' => 'Finished Product', 'status' => 1],
@@ -25,6 +34,7 @@ class ProductTypeSeeder extends Seeder
                 'name' => $type['name'],
                 'status' => $type['status'],
                 'is_deleted' => false,
+                'company_id' => $company->id,
             ]);
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\CompanyScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Sales extends Model
@@ -23,6 +24,7 @@ class Sales extends Model
         'adv_inc_tax_percentage',
         'adv_inc_tax_amount',
         'grand_total',
+        'company_id',
     ];
 
     protected $casts = [
@@ -35,6 +37,16 @@ class Sales extends Model
         'adv_inc_tax_amount' => 'decimal:2',
         'grand_total' => 'decimal:2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function customer()
     {

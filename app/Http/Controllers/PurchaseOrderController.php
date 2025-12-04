@@ -137,6 +137,9 @@ class PurchaseOrderController extends Controller
                 $grandTotal = $subtotal + $labourCharges + $freightCharges;
             }
             
+            $user = Auth::user();
+            $companyId = $user->company_id;
+
             // Create purchase
             $purchase = Purchase::create([
                 'type' => $type,
@@ -154,6 +157,7 @@ class PurchaseOrderController extends Controller
                 'subtotal' => $subtotal,
                 'total_gst' => $totalGst,
                 'grand_total' => $grandTotal,
+                'company_id' => $companyId,
             ]);
             
             // Create purchase products and update warehouse stock
@@ -185,6 +189,7 @@ class PurchaseOrderController extends Controller
                     'net_amount' => $netAmount,
                     'gst_amount' => $gstAmount,
                     'total_amount' => $totalAmount,
+                    'company_id' => $companyId,
                 ]);
                 
                 // Update product current_qty
@@ -197,8 +202,9 @@ class PurchaseOrderController extends Controller
                         [
                             'warehouse_id' => $purchase->warehouse_id,
                             'product_id' => $productData['product_id'],
+                            'company_id' => $companyId,
                         ],
-                        ['qty' => 0]
+                        ['qty' => 0, 'company_id' => $companyId]
                     );
                     $warehouseStock->qty += $qty;
                     $warehouseStock->save();
@@ -247,7 +253,12 @@ class PurchaseOrderController extends Controller
      */
     public function show($id)
     {
-        $purchase = Purchase::with(['vendor', 'warehouse', 'products.product'])->findOrFail($id);
+        $purchase = Purchase::with(['vendor', 'warehouse', 'products.product', 'company'])->findOrFail($id);
+        
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $purchase->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
         
         if ($purchase->type === 'tax') {
             return view('pages.purchase-orders.tax.show', compact('purchase'));
@@ -261,8 +272,14 @@ class PurchaseOrderController extends Controller
      */
     public function print($id)
     {
-        $purchase = Purchase::with(['vendor', 'warehouse', 'products.product'])->findOrFail($id);
-        $printedBy = Auth::user();
+        $purchase = Purchase::with(['vendor', 'warehouse', 'products.product', 'company'])->findOrFail($id);
+        $user = Auth::user();
+        
+        if (!$user->isSuperAdmin() && $purchase->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+        
+        $printedBy = $user;
         
         return view('pages.purchase-orders.print', compact('purchase', 'printedBy'));
     }

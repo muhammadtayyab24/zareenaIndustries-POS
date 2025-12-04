@@ -6,6 +6,7 @@ use App\Models\Warehouse;
 use App\Models\WarehouseStock;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class WarehouseController extends Controller
@@ -32,15 +33,18 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $companyId = $user->company_id;
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:255', Rule::unique('warehouses')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'code' => ['nullable', 'string', 'max:255', Rule::unique('warehouses')->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })],
             'contact' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('warehouses')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('warehouses')->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })],
             'status' => ['sometimes', 'integer', 'in:0,1'],
         ]);
@@ -53,6 +57,7 @@ class WarehouseController extends Controller
             'email' => $validated['email'] ?? null,
             'status' => $validated['status'] ?? 1, // Default to active if not provided
             'is_deleted' => false,
+            'company_id' => $companyId,
         ]);
 
         return redirect()->route('warehouses.index')->with('success', 'Warehouse created successfully.');
@@ -71,6 +76,11 @@ class WarehouseController extends Controller
      */
     public function edit(Warehouse $warehouse)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $warehouse->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($warehouse->is_deleted) {
             return redirect()->route('warehouses.index')->with('error', 'Warehouse not found.');
         }
@@ -82,19 +92,26 @@ class WarehouseController extends Controller
      */
     public function update(Request $request, Warehouse $warehouse)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $warehouse->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($warehouse->is_deleted) {
             return redirect()->route('warehouses.index')->with('error', 'Warehouse not found.');
         }
 
+        $companyId = $user->company_id;
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:255', Rule::unique('warehouses')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'code' => ['nullable', 'string', 'max:255', Rule::unique('warehouses')->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })->ignore($warehouse->id)],
             'contact' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('warehouses')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('warehouses')->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })->ignore($warehouse->id)],
             'status' => ['required', 'integer', 'in:0,1'],
         ]);
@@ -109,6 +126,11 @@ class WarehouseController extends Controller
      */
     public function destroy(Warehouse $warehouse)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $warehouse->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($warehouse->is_deleted) {
             return redirect()->route('warehouses.index')->with('error', 'Warehouse not found.');
         }
@@ -129,6 +151,14 @@ class WarehouseController extends Controller
      */
     public function toggleStatus(Request $request, Warehouse $warehouse)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $warehouse->company_id !== $user->company_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
         if ($warehouse->is_deleted) {
             return response()->json([
                 'success' => false,

@@ -31,14 +31,17 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $companyId = $user->company_id;
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:Cash,Credit'],
             'contact' => ['nullable', 'string', 'max:255'],
             'ntn' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers')->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers')->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })],
             'status' => ['sometimes', 'integer', 'in:0,1'],
         ]);
@@ -52,6 +55,7 @@ class CustomerController extends Controller
             'email' => $validated['email'] ?? null,
             'status' => $validated['status'] ?? 1, // Default to active if not provided
             'is_deleted' => false,
+            'company_id' => $companyId,
         ]);
 
         return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
@@ -62,6 +66,11 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $customer->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($customer->is_deleted) {
             abort(404);
         }
@@ -77,14 +86,22 @@ class CustomerController extends Controller
             abort(404);
         }
 
+        $user = Auth::user();
+        $companyId = $user->company_id;
+
+        // Check if user can access this customer
+        if (!$user->isSuperAdmin() && $customer->company_id !== $companyId) {
+            abort(403, 'Unauthorized access');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:Cash,Credit'],
             'contact' => ['nullable', 'string', 'max:255'],
             'ntn' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers')->ignore($customer->id)->where(function ($query) {
-                return $query->where('is_deleted', false);
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('customers')->ignore($customer->id)->where(function ($query) use ($companyId) {
+                return $query->where('company_id', $companyId)->where('is_deleted', false);
             })],
             'status' => ['required', 'integer', 'in:0,1'],
         ]);
@@ -99,6 +116,11 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $customer->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         // Soft delete - modify email to allow reuse
         if ($customer->email) {
             $customer->email = $customer->email . '_deleted_' . time();
@@ -114,6 +136,14 @@ class CustomerController extends Controller
      */
     public function toggleStatus(Request $request, Customer $customer)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $customer->company_id !== $user->company_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
         if ($customer->is_deleted) {
             return response()->json([
                 'success' => false,

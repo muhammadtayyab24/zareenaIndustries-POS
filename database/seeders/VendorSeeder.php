@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Vendor;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class VendorSeeder extends Seeder
@@ -105,6 +106,14 @@ class VendorSeeder extends Seeder
             ],
         ];
 
+        // Get Zareena Industries company
+        $company = Company::where('name', 'Zareena Industries')->first();
+        
+        if (!$company) {
+            $this->command->error('Company not found. Please run CompanySeeder first.');
+            return;
+        }
+
         foreach ($vendors as $vendor) {
             Vendor::create([
                 'name' => $vendor['name'],
@@ -115,6 +124,7 @@ class VendorSeeder extends Seeder
                 'email' => $vendor['email'],
                 'status' => $vendor['status'],
                 'is_deleted' => false,
+                'company_id' => $company->id,
             ]);
         }
     }

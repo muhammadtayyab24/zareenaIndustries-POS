@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\CompanyScope;
 use Illuminate\Database\Eloquent\Model;
 
 class EmployeeSalary extends Model
@@ -18,6 +19,7 @@ class EmployeeSalary extends Model
         'ot_amount',
         'final_salary',
         'notes',
+        'company_id',
     ];
 
     protected $casts = [
@@ -30,6 +32,16 @@ class EmployeeSalary extends Model
         'ot_amount' => 'decimal:2',
         'final_salary' => 'decimal:2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function employee()
     {

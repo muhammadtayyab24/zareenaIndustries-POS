@@ -38,6 +38,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $companyId = $user->company_id;
+
         $validated = $request->validate([
             'cat_id' => ['required', 'exists:product_categories,id'],
             'type_id' => ['required', 'exists:product_types,id'],
@@ -57,6 +60,7 @@ class ProductController extends Controller
             'current_qty' => $validated['current_qty'] ?? $validated['opening_qty'] ?? 0,
             'status' => $validated['status'] ?? 1, // Default to active if not provided
             'is_deleted' => false,
+            'company_id' => $companyId,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
@@ -67,6 +71,11 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $product->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($product->is_deleted) {
             abort(404);
         }
@@ -80,6 +89,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $product->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         if ($product->is_deleted) {
             abort(404);
         }
@@ -104,6 +118,11 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $product->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access');
+        }
+
         // Soft delete - modify product name to allow reuse
         $product->product_name = $product->product_name . '_deleted_' . time();
         $product->is_deleted = true;
@@ -117,6 +136,14 @@ class ProductController extends Controller
      */
     public function toggleStatus(Request $request, Product $product)
     {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $product->company_id !== $user->company_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
         if ($product->is_deleted) {
             return response()->json([
                 'success' => false,

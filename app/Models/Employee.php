@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\CompanyScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
@@ -14,6 +15,7 @@ class Employee extends Model
         'ot_rate_per_hour',
         'status',
         'is_deleted',
+        'company_id',
     ];
 
     protected $casts = [
@@ -22,6 +24,16 @@ class Employee extends Model
         'status' => 'integer',
         'is_deleted' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function attendances()
     {

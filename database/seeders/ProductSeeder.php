@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductType;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -269,6 +270,14 @@ class ProductSeeder extends Seeder
             ],
         ];
 
+        // Get Zareena Industries company
+        $company = Company::where('name', 'Zareena Industries')->first();
+        
+        if (!$company) {
+            $this->command->error('Company not found. Please run CompanySeeder first.');
+            return;
+        }
+
         foreach ($products as $product) {
             Product::create([
                 'cat_id' => $product['cat_id'],
@@ -279,6 +288,7 @@ class ProductSeeder extends Seeder
                 'current_qty' => $product['current_qty'],
                 'status' => $product['status'],
                 'is_deleted' => false,
+                'company_id' => $company->id,
             ]);
         }
     }

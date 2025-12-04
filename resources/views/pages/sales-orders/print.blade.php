@@ -252,14 +252,41 @@
         </div>
 
         <div class="invoice-header">
-            <h1>ZAREENA INDUSTRIES</h1>
-            <div class="company-info">
-                <p>D-27 Manghopir Road, S.I.T.E. Karachi.</p>
-                <p>Tel: 92-021-32588033 | E-Mail: info@zareenaindustries.com</p>
-                @if ($sale->type === 'tax')
-                    <p>N.T.N.: 3238408-4 | S.T.R.N: 17-00-3238-408-14</p>
+            @if($sale->company)
+                @if($sale->company->logo)
+                    <img src="{{ Storage::url($sale->company->logo) }}" alt="Logo" style="max-height: 80px; margin-bottom: 10px;">
                 @endif
-            </div>
+                <h1>{{ strtoupper($sale->company->name) }}</h1>
+                <div class="company-info">
+                    @if($sale->company->address)
+                        <p>{{ $sale->company->address }}</p>
+                    @endif
+                    <p>
+                        @if($sale->company->tel_no)Tel: {{ $sale->company->tel_no }}@endif
+                        @if($sale->company->mobile_no && $sale->company->tel_no) | @endif
+                        @if($sale->company->mobile_no)Mobile: {{ $sale->company->mobile_no }}@endif
+                        @if($sale->company->email) | E-Mail: {{ $sale->company->email }}@endif
+                    </p>
+                    @if ($sale->type === 'tax')
+                        @if($sale->company->ntn || $sale->company->strn)
+                            <p>
+                                @if($sale->company->ntn)N.T.N.: {{ $sale->company->ntn }}@endif
+                                @if($sale->company->ntn && $sale->company->strn) | @endif
+                                @if($sale->company->strn)S.T.R.N: {{ $sale->company->strn }}@endif
+                            </p>
+                        @endif
+                    @endif
+                </div>
+            @else
+                <h1>ZAREENA INDUSTRIES</h1>
+                <div class="company-info">
+                    <p>D-27 Manghopir Road, S.I.T.E. Karachi.</p>
+                    <p>Tel: 92-021-32588033 | E-Mail: info@zareenaindustries.com</p>
+                    @if ($sale->type === 'tax')
+                        <p>N.T.N.: 3238408-4 | S.T.R.N: 17-00-3238-408-14</p>
+                    @endif
+                </div>
+            @endif
         </div>
 
         <div class="invoice-details">

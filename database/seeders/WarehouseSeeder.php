@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Warehouse;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class WarehouseSeeder extends Seeder
@@ -55,6 +56,14 @@ class WarehouseSeeder extends Seeder
             ],
         ];
 
+        // Get Zareena Industries company
+        $company = Company::where('name', 'Zareena Industries')->first();
+        
+        if (!$company) {
+            $this->command->error('Company not found. Please run CompanySeeder first.');
+            return;
+        }
+
         foreach ($warehouses as $warehouse) {
             Warehouse::create([
                 'name' => $warehouse['name'],
@@ -64,6 +73,7 @@ class WarehouseSeeder extends Seeder
                 'email' => $warehouse['email'],
                 'status' => $warehouse['status'],
                 'is_deleted' => false,
+                'company_id' => $company->id,
             ]);
         }
     }
