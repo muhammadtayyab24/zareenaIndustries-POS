@@ -3,85 +3,147 @@
 @section('title', 'Dashboard | Rizz - Admin & Dashboard Template')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
-                    <div class="col-9">
-                        <p class="text-dark mb-0 fw-semibold fs-14">Sessions</p>
-                        <h3 class="mt-2 mb-0 fw-bold">24k</h3>
-                    </div>
-                    <!--end col-->
-                    <div class="col-3 align-self-center">
-                        <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
-                            <i class="iconoir-hexagon-dice h1 align-self-center mb-0 text-secondary"></i>
+@if(auth()->user()->isSuperAdmin())
+    <!-- Super Admin Dashboard Cards -->
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
+                        <div class="col-9">
+                            <p class="text-dark mb-0 fw-semibold fs-14">Total Companies</p>
+                            <h3 class="mt-2 mb-0 fw-bold">{{ number_format($totalCompanies ?? 0) }}</h3>
                         </div>
-                    </div>
-                    <!--end col-->
-                </div>
-                <!--end row-->
-                <p class="mb-0 text-truncate text-muted mt-3"><span class="text-success">8.5%</span>
-                    New Sessions Today</p>
-            </div>
-            <!--end card-body-->
-        </div>
-        <!--end card-->
-    </div>
-    <!--end col-->
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
-                    <div class="col-9">
-                        <p class="text-dark mb-0 fw-semibold fs-14">Avg.Sessions</p>
-                        <h3 class="mt-2 mb-0 fw-bold">00:18</h3>
-                    </div>
-                    <!--end col-->
-                    <div class="col-3 align-self-center">
-                        <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
-                            <i class="iconoir-clock h1 align-self-center mb-0 text-secondary"></i>
+                        <!--end col-->
+                        <div class="col-3 align-self-center">
+                            <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
+                                <i class="fas fa-building h1 align-self-center mb-0 text-primary"></i>
+                            </div>
                         </div>
+                        <!--end col-->
                     </div>
-                    <!--end col-->
+                    <!--end row-->
+                    <p class="mb-0 text-truncate text-muted mt-3">
+                        <a href="{{ route('companies.index') }}" class="text-primary">View All Companies <i class="fas fa-arrow-right ms-1"></i></a>
+                    </p>
                 </div>
-                <!--end row-->
-                <p class="mb-0 text-truncate text-muted mt-3"><span class="text-success">1.5%</span>
-                    Weekly Avg.Sessions</p>
+                <!--end card-body-->
             </div>
-            <!--end card-body-->
+            <!--end card-->
         </div>
-        <!--end card-->
-    </div>
-    <!--end col-->
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
-                    <div class="col-9">
-                        <p class="text-dark mb-0 fw-semibold fs-14">Bounce
-                            Rate</p>
-                        <h3 class="mt-2 mb-0 fw-bold">36.45%</h3>
-                    </div>
-                    <!--end col-->
-                    <div class="col-3 align-self-center">
-                        <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
-                            <i class="iconoir-percentage-circle h1 align-self-center mb-0 text-secondary"></i>
+        <!--end col-->
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
+                        <div class="col-9">
+                            <p class="text-dark mb-0 fw-semibold fs-14">Total Users</p>
+                            <h3 class="mt-2 mb-0 fw-bold">{{ number_format($totalUsers ?? 0) }}</h3>
                         </div>
+                        <!--end col-->
+                        <div class="col-3 align-self-center">
+                            <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
+                                <i class="fas fa-users h1 align-self-center mb-0 text-success"></i>
+                            </div>
+                        </div>
+                        <!--end col-->
                     </div>
-                    <!--end col-->
+                    <!--end row-->
+                    <p class="mb-0 text-truncate text-muted mt-3">
+                        <a href="{{ route('companies.admins') }}" class="text-primary">View All Admins <i class="fas fa-arrow-right ms-1"></i></a>
+                    </p>
                 </div>
-                <!--end row-->
-                <p class="mb-0 text-truncate text-muted mt-3"><span class="text-danger">8%</span>
-                   Up Bounce Rate Weekly</p>
+                <!--end card-body-->
             </div>
-            <!--end card-body-->
+            <!--end card-->
         </div>
-        <!--end card-->
+        <!--end col-->
     </div>
-    <!--end col-->
-</div>
-<!--end row-->
+    <!--end row-->
+@else
+    <!-- Regular Dashboard for Company Users -->
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
+                        <div class="col-9">
+                            <p class="text-dark mb-0 fw-semibold fs-14">Sessions</p>
+                            <h3 class="mt-2 mb-0 fw-bold">24k</h3>
+                        </div>
+                        <!--end col-->
+                        <div class="col-3 align-self-center">
+                            <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
+                                <i class="iconoir-hexagon-dice h1 align-self-center mb-0 text-secondary"></i>
+                            </div>
+                        </div>
+                        <!--end col-->
+                    </div>
+                    <!--end row-->
+                    <p class="mb-0 text-truncate text-muted mt-3"><span class="text-success">8.5%</span>
+                        New Sessions Today</p>
+                </div>
+                <!--end card-body-->
+            </div>
+            <!--end card-->
+        </div>
+        <!--end col-->
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
+                        <div class="col-9">
+                            <p class="text-dark mb-0 fw-semibold fs-14">Avg.Sessions</p>
+                            <h3 class="mt-2 mb-0 fw-bold">00:18</h3>
+                        </div>
+                        <!--end col-->
+                        <div class="col-3 align-self-center">
+                            <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
+                                <i class="iconoir-clock h1 align-self-center mb-0 text-secondary"></i>
+                            </div>
+                        </div>
+                        <!--end col-->
+                    </div>
+                    <!--end row-->
+                    <p class="mb-0 text-truncate text-muted mt-3"><span class="text-success">1.5%</span>
+                        Weekly Avg.Sessions</p>
+                </div>
+                <!--end card-body-->
+            </div>
+            <!--end card-->
+        </div>
+        <!--end col-->
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
+                        <div class="col-9">
+                            <p class="text-dark mb-0 fw-semibold fs-14">Bounce
+                                Rate</p>
+                            <h3 class="mt-2 mb-0 fw-bold">36.45%</h3>
+                        </div>
+                        <!--end col-->
+                        <div class="col-3 align-self-center">
+                            <div class="d-flex justify-content-center align-items-center thumb-xl bg-light rounded-circle mx-auto">
+                                <i class="iconoir-percentage-circle h1 align-self-center mb-0 text-secondary"></i>
+                            </div>
+                        </div>
+                        <!--end col-->
+                    </div>
+                    <!--end row-->
+                    <p class="mb-0 text-truncate text-muted mt-3"><span class="text-danger">8%</span>
+                       Up Bounce Rate Weekly</p>
+                </div>
+                <!--end card-body-->
+            </div>
+            <!--end card-->
+        </div>
+        <!--end col-->
+    </div>
+    <!--end row-->
+@endif
+
+@if(!auth()->user()->isSuperAdmin())
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-8">
         <div class="card">
@@ -459,4 +521,5 @@
     <!--end col-->
 </div>
 <!--end row-->
+@endif
 @endsection

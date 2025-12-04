@@ -30,16 +30,38 @@
                             <span>Company Management</span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('companies.create') }}">
+                            <a class="nav-link" href="#sidebarCompanies" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="sidebarCompanies">
                                 <i class="fas fa-building menu-icon"></i>
-                                <span>Create Company</span>
+                                <span>Companies</span>
                             </a>
+                            <div class="collapse " id="sidebarCompanies">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('companies.create') }}">Create</a>
+                                    </li><!--end nav-item-->
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('companies.index') }}">View</a>
+                                    </li><!--end nav-item-->
+                                </ul><!--end nav-->
+                            </div><!--end sidebarCompanies-->
                         </li><!--end nav-item-->
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('companies.create-admin') }}">
+                            <a class="nav-link" href="#sidebarAdmins" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="sidebarAdmins">
                                 <i class="fas fa-user-shield menu-icon"></i>
-                                <span>Create Company Admin</span>
+                                <span>Company Admins</span>
                             </a>
+                            <div class="collapse " id="sidebarAdmins">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('companies.create-admin') }}">Create</a>
+                                    </li><!--end nav-item-->
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('companies.admins') }}">View</a>
+                                    </li><!--end nav-item-->
+                                </ul><!--end nav-->
+                            </div><!--end sidebarAdmins-->
                         </li><!--end nav-item-->
                     @else
                         <!-- Regular Menu for Company Users -->

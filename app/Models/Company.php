@@ -19,6 +19,7 @@ class Company extends Model
         'mobile_no',
         'website',
         'logo',
+        'favicon',
         'status',
         'is_deleted',
     ];

@@ -32,8 +32,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     
     // Company Management Routes (Super Admin only)
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
     Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
+    Route::get('/companies/admins', [CompanyController::class, 'admins'])->name('companies.admins');
     Route::get('/companies/create-admin', [CompanyController::class, 'createAdmin'])->name('companies.create-admin');
     Route::post('/companies/store-admin', [CompanyController::class, 'storeAdmin'])->name('companies.store-admin');
     

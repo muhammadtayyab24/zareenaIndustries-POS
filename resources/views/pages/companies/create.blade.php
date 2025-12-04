@@ -44,7 +44,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('companies.store') }}" class="my-4">
+                <form method="POST" action="{{ route('companies.store') }}" enctype="multipart/form-data" class="my-4">
                     @csrf
                     
                     <!-- Company Information Section -->
@@ -142,6 +142,36 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="company_logo" class="form-label">Company Logo</label>
+                                    <input type="file" class="form-control @error('company_logo') is-invalid @enderror" 
+                                           id="company_logo" name="company_logo" accept="image/*" onchange="previewLogo(this)">
+                                    <small class="text-muted">Recommended: PNG, JPG, SVG (Max: 2MB)</small>
+                                    @error('company_logo')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div id="logo_preview" class="mt-2" style="display: none;">
+                                        <img id="logo_preview_img" src="" alt="Logo Preview" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px; padding: 5px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="company_favicon" class="form-label">Company Favicon</label>
+                                    <input type="file" class="form-control @error('company_favicon') is-invalid @enderror" 
+                                           id="company_favicon" name="company_favicon" accept="image/*" onchange="previewFavicon(this)">
+                                    <small class="text-muted">Recommended: ICO, PNG (Max: 500KB, Size: 32x32 or 16x16)</small>
+                                    @error('company_favicon')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div id="favicon_preview" class="mt-2" style="display: none;">
+                                        <img id="favicon_preview_img" src="" alt="Favicon Preview" style="max-width: 64px; max-height: 64px; border: 1px solid #ddd; border-radius: 4px; padding: 5px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Admin Information Section -->
@@ -216,6 +246,44 @@
 
 @push('scripts')
 <script>
+    // Logo Preview Function
+    function previewLogo(input) {
+        const preview = document.getElementById('logo_preview');
+        const previewImg = document.getElementById('logo_preview_img');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    // Favicon Preview Function
+    function previewFavicon(input) {
+        const preview = document.getElementById('favicon_preview');
+        const previewImg = document.getElementById('favicon_preview_img');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
     // Auto-dismiss alerts after 5 seconds
     document.querySelectorAll('[data-auto-dismiss]').forEach(function(alert) {
         const delay = parseInt(alert.getAttribute('data-auto-dismiss'));

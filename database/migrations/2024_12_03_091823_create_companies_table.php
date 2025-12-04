@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('mobile_no')->nullable(); // Mobile Number
             $table->string('website')->nullable();
             $table->string('logo')->nullable(); // Logo path
+            $table->string('favicon')->nullable(); // Favicon path
             $table->tinyInteger('status')->default(1); // 0 = inactive, 1 = active
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();
